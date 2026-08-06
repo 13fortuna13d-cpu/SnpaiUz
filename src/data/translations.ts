@@ -7,10 +7,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.catalog': 'Katalog',
     'nav.top': 'Top Anime',
     'nav.schedule': 'Jadval',
-    'nav.vip': 'SnpaiUz VIP',
+    'nav.vip': 'AniSenpaiUz VIP',
     'nav.admin': 'Admin Panel',
     'nav.categories': 'Kategoriyalar',
     'nav.favorites': 'Sevimlilar',
+    'nav.profile': 'Profil',
     'search.placeholder': 'Anime, janr yoki studiyani izlang...',
     'search.voice': 'Ovozli qidiruv',
     'search.listening': 'Eshitilmoqda... Gapiring!',
@@ -27,7 +28,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.password': 'Parol',
     'auth.forgot_password': 'Parolni unutdingizmi?',
     'auth.email_verification': 'Tasdiqlash kodi',
-    'auth.welcome_back': 'SnpaiUz ga xush kelibsiz!',
+    'auth.welcome_back': 'AniSenpaiUz ga xush kelibsiz!',
     'auth.create_account': 'Yangi hisob yaratish',
     'auth.login_required': 'Profilga kirish uchun tizimdan o\'ting',
     'auth.back_home': 'Bosh sahifaga qaytish',
@@ -36,7 +37,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.watch_now': 'Hozir tomosha qilish',
     'hero.add_watchlist': 'Saralanganlarga',
     'hero.in_watchlist': 'Saralanganlarda',
-    'hero.top_pick': 'SnpaiUz Saralangan',
+    'hero.top_pick': 'AniSenpaiUz Saralangan',
     'home.continue_watching': 'Davom ettirish',
     'home.trending': '🔥 Trenddagi animelar',
     'home.popular': '⭐ Eng ommabop',
@@ -324,6 +325,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.admin': 'Admin Panel',
     'nav.categories': 'Categories',
     'nav.favorites': 'Favorites',
+    'nav.profile': 'Profile',
     'search.placeholder': 'Search anime, genre, or studio...',
     'search.voice': 'Voice Search',
     'search.listening': 'Listening... Speak now!',
@@ -499,7 +501,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'profile.registered': 'Joined:',
 
     // Admin Panel
-    'admin.title': 'SnpaiUz Control Panel',
+    'admin.title': 'AniSenpaiUz Control Panel',
     'admin.dashboard': 'Dashboard',
     'admin.manage_anime': 'Manage Anime',
     'admin.add_anime': 'Add New Anime',
@@ -521,7 +523,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.online': 'System Online',
 
     // Home Stats & Banner
-    'home.stats_title': 'SenpaiUz Analytics & Stats System',
+    'home.stats_title': 'AniSenpaiUz Analytics & Stats System',
     'home.stats_sub': 'Live indicators computed automatically in real-time from database',
     'home.real_sync': 'Real Backend Sync',
     'home.total_anime': 'Total Anime',
@@ -637,6 +639,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.admin': 'Админ панель',
     'nav.categories': 'Категории',
     'nav.favorites': 'Избранное',
+    'nav.profile': 'Профиль',
     'search.placeholder': 'Поиск аниме, жанра или студии...',
     'search.voice': 'Голосовой поиск',
     'search.listening': 'Слушаю... Говорите!',
@@ -812,7 +815,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'profile.registered': 'Дата регистрации:',
 
     // Admin Panel
-    'admin.title': 'Панель Управления SnpaiUz',
+    'admin.title': 'Панель Управления AniSenpaiUz',
     'admin.dashboard': 'Дашборд',
     'admin.manage_anime': 'Управление Аниме',
     'admin.add_anime': 'Добавить Аниме',
@@ -834,7 +837,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'common.online': 'Система онлайн',
 
     // Home Stats & Banner
-    'home.stats_title': 'Система Аналитики и Статистики SenpaiUz',
+    'home.stats_title': 'Система Аналитики и Статистики AniSenpaiUz',
     'home.stats_sub': 'Живые показатели, автоматически рассчитываемые из базы данных в реальном времени',
     'home.real_sync': 'Синхронизация с сервером',
     'home.total_anime': 'Всего Аниме',

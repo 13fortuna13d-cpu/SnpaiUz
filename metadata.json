@@ -1,6 +1,6 @@
 {
-  "name": "SnpaiUz",
-  "description": "SnpaiUz - Professional Anime Streaming Platform with high quality streaming, multi-language support (Uzbek, English, Russian), custom player, community, and admin control.",
+  "name": "AniSenpaiUz",
+  "description": "AniSenpaiUz - Professional Anime & Manga Platform with high quality streaming, multi-language support (Uzbek, English, Russian), custom player, community, coins system and full admin control.",
   "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

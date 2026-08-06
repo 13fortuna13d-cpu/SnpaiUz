@@ -67,8 +67,8 @@ export const WatchPage: React.FC<WatchPageProps> = ({
   return (
     <div className="space-y-8">
       <SeoHead
-        title={`${title} - ${t('player.episode')} ${episode.number} (SnpaiUz)`}
-        description={`SnpaiUz platformasida ${title} animesining ${episode.number}-qismini Full HD 1080p va O'zbekcha dublyajda tomosha qiling.`}
+        title={`${title} - ${t('player.episode')} ${episode.number} (AniSenpaiUz)`}
+        description={`AniSenpaiUz platformasida ${title} animesining ${episode.number}-qismini Full HD 1080p va O'zbekcha dublyajda tomosha qiling.`}
         image={anime.poster}
       />
 

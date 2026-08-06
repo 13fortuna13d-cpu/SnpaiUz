@@ -283,7 +283,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         style={{ top: watermarkPos.top, left: watermarkPos.left }}
         className="absolute z-10 pointer-events-none transition-all duration-1000 ease-in-out px-2.5 py-1 rounded-md bg-slate-950/40 border border-white/10 text-slate-300/40 text-[10px] font-mono font-bold tracking-wider uppercase backdrop-blur-[1px]"
       >
-        <span>SnpaiUz • {user?.name || 'Protected'} ({user?.id ? user.id.slice(0, 8) : 'guest'})</span>
+        <span>AniSenpaiUz • {user?.name || 'Protected'} ({user?.id ? user.id.slice(0, 8) : 'guest'})</span>
       </div>
 
       {/* VIP Paywall Overlay for Episodes > 2 */}

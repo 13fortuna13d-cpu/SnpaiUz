@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, Mic, Crown, Globe, LogOut, 
-  Settings, Heart, History, Shield, X, Play, Sparkles, Flame, Bell, Wallet, Grid, User as UserIcon
+  Settings, Heart, History, Shield, X, Play, Sparkles, Flame, Bell, Wallet, Grid, User as UserIcon, BookOpen
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
@@ -104,7 +104,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 w-full z-[99999] bg-slate-950 border-b border-purple-900/30 text-white shadow-lg shadow-purple-950/20"
+      className="fixed top-0 left-0 right-0 w-full z-[99999] bg-slate-950/95 backdrop-blur-md border-b border-purple-900/30 text-white shadow-lg shadow-purple-950/20 transition-all duration-200 will-change-transform"
       style={{ position: 'fixed', top: 0, left: 0, right: 0, width: '100%', zIndex: 99999 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3 sm:gap-6 w-full">
@@ -121,7 +121,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
           <div>
             <span className="text-xl sm:text-2xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 font-sans">
-              Senpai<span className="text-purple-400 font-black">Uz</span>
+              AniSenpai<span className="text-purple-400 font-black">Uz</span>
             </span>
             <span className="hidden sm:inline-block text-[10px] uppercase font-bold text-cyan-400 tracking-widest block -mt-1 opacity-90">
               Anime Platform
@@ -151,6 +151,18 @@ export const Header: React.FC<HeaderProps> = ({
             }`}
           >
             {t('nav.catalog')}
+          </button>
+
+          <button
+            onClick={() => onNavigate('manga')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 ${
+              activePage === 'manga' || activePage === 'manga-detail' || activePage === 'manga-reader'
+                ? 'bg-purple-600 text-white font-bold shadow-md shadow-purple-600/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+            <span>Manga</span>
           </button>
 
           <button
@@ -343,6 +355,89 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
           </div>
+
+          {/* User Profile / Auth Button */}
+          <div ref={userMenuRef} className="relative z-50 shrink-0">
+            {user ? (
+              <div>
+                <button
+                  onClick={toggleUserMenu}
+                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-slate-900/90 border border-purple-500/30 hover:border-purple-500 text-xs font-bold transition-all"
+                >
+                  <img
+                    src={user.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'}
+                    alt={user.name}
+                    className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg object-cover ring-1 ring-purple-400 shrink-0"
+                  />
+                  <span className="hidden md:inline truncate max-w-[90px]">{user.name}</span>
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-slate-900/95 backdrop-blur-2xl border border-slate-800 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
+                    <div className="px-3 py-2 border-b border-slate-800/80 mb-1">
+                      <p className="text-xs font-extrabold text-white truncate">{user.name}</p>
+                      <p className="text-[10px] text-slate-400 truncate">{user.email}</p>
+                      {user.isVip && (
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-amber-500/20 text-amber-300 text-[9px] font-black rounded-md border border-amber-500/30">
+                          VIP STATUS
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => { onNavigate('profile'); setIsUserMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition-colors"
+                    >
+                      <UserIcon className="w-4 h-4 text-purple-400" />
+                      <span>{t('auth.profile')}</span>
+                    </button>
+
+                    <button
+                      onClick={() => { onNavigate('favorites'); setIsUserMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition-colors"
+                    >
+                      <Heart className="w-4 h-4 text-pink-400" />
+                      <span>{t('nav.favorites')}</span>
+                    </button>
+
+                    <button
+                      onClick={() => { onNavigate('profile', { tab: 'settings' }); setIsUserMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2 transition-colors"
+                    >
+                      <Settings className="w-4 h-4 text-cyan-400" />
+                      <span>Sozlamalar</span>
+                    </button>
+
+                    {(user.role === 'admin' || user.role === 'super_admin') && (
+                      <button
+                        onClick={() => { onNavigate('admin'); setIsUserMenuOpen(false); }}
+                        className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/50 flex items-center gap-2 transition-colors"
+                      >
+                        <Shield className="w-4 h-4 text-cyan-400" />
+                        <span>{t('nav.admin')}</span>
+                      </button>
+                    )}
+
+                    <button
+                      onClick={() => { logout(); setIsUserMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 rounded-xl text-xs font-bold text-rose-400 hover:bg-rose-500/10 flex items-center gap-2 transition-colors border-t border-slate-800/80 mt-1"
+                    >
+                      <LogOut className="w-4 h-4 text-rose-400" />
+                      <span>{t('auth.logout')}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={onOpenAuth}
+                className="px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-extrabold shadow-lg shadow-purple-600/30 transition-all shrink-0"
+              >
+                {t('auth.login')}
+              </button>
+            )}
+          </div>
+
         </div>
       </div>
 

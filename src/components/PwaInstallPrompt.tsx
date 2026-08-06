@@ -25,7 +25,7 @@ export const PwaInstallPrompt: React.FC = () => {
       }
       setDeferredPrompt(null);
     } else {
-      alert('SnpaiUz dasturini o\'rnatish uchun brauzeringiz menyusidagi "Ekraningizga qo\'shish" tugmasini bosing.');
+      alert('AniSenpaiUz dasturini o\'rnatish uchun brauzeringiz menyusidagi "Ekraningizga qo\'shish" tugmasini bosing.');
     }
   };
 
@@ -38,7 +38,7 @@ export const PwaInstallPrompt: React.FC = () => {
           <Smartphone className="w-5 h-5" />
         </div>
         <div>
-          <h4 className="font-bold text-white text-xs">SnpaiUz ilovasini o'rnating</h4>
+          <h4 className="font-bold text-white text-xs">AniSenpaiUz ilovasini o'rnating</h4>
           <p className="text-[11px] text-slate-400">Tezroq kirish va bildirishnomalar</p>
         </div>
       </div>

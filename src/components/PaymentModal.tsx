@@ -59,7 +59,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ onClose }) => {
         <div className="text-center space-y-2 pt-2">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold">
             <Crown className="w-4 h-4 text-amber-400" />
-            <span>SnpaiUz Premium VIP</span>
+            <span>AniSenpaiUz Premium VIP</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-white">{t('vip.title')}</h2>
           <p className="text-slate-400 text-xs sm:text-sm max-w-md mx-auto">{t('vip.subtitle')}</p>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, History, Settings, Crown, Camera, Play, Wallet, ShieldCheck, User as UserIcon, Phone, Mail, LogOut, Plus, ArrowUpRight, Award, Edit3, Check, Bell, Lock } from 'lucide-react';
+import { Heart, History, Settings, Crown, Camera, Play, Wallet, ShieldCheck, User as UserIcon, Phone, Mail, LogOut, Plus, ArrowUpRight, Award, Edit3, Check, Bell, Lock, Coins, Share2, Copy, Sparkles, BookOpen, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAnime } from '../context/AnimeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -9,22 +9,25 @@ import { SeoHead } from '../components/SeoHead';
 import { TopUpModal } from '../components/TopUpModal';
 
 interface ProfilePageProps {
-  initialTab?: 'overview' | 'watchlist' | 'history' | 'balance' | 'settings';
+  initialTab?: 'overview' | 'watchlist' | 'history' | 'balance' | 'settings' | 'coins';
   onNavigate: (page: string, params?: any) => void;
   onOpenVip: () => void;
+  onOpenCoinModal?: () => void;
 }
 
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   initialTab = 'overview',
   onNavigate,
-  onOpenVip
+  onOpenVip,
+  onOpenCoinModal
 }) => {
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme, themeNames } = useTheme();
   const { user, updateAvatar, updateProfile, logout, buyVipWithBalance, changePassword } = useAuth();
-  const { animeList } = useAnime();
+  const { animeList, socialSettings } = useAnime();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'watchlist' | 'history' | 'balance' | 'settings'>(initialTab);
+  const [activeTab, setActiveTab] = useState<'overview' | 'watchlist' | 'history' | 'balance' | 'settings' | 'coins'>(initialTab);
+  const [copiedRefLink, setCopiedRefLink] = useState(false);
 
   React.useEffect(() => {
     if (initialTab) {
@@ -196,13 +199,24 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
             <span>VIP Xarid Qilish</span>
           </button>
 
+          {/* Telegram Support Button */}
+          <a
+            href={socialSettings.telegramUrl || 'https://t.me/SenpaiUzz'}
+            target="_blank"
+            rel="noreferrer"
+            className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-cyan-600/30 border border-cyan-500/50 hover:bg-cyan-600/40 text-cyan-300 font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-cyan-600/10"
+          >
+            <Send className="w-4 h-4 text-cyan-400" />
+            <span>Qo'llab-quvvatlash ({socialSettings.telegramUsername || '@SenpaiUzz'})</span>
+          </a>
+
           {/* Admin Panel Button - ONLY FOR ADMINS */}
           {(user.role === 'admin' || user.role === 'super_admin') && (
             <button
               onClick={() => onNavigate('admin')}
-              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-cyan-600/30 border border-cyan-500/50 hover:bg-cyan-600/40 text-cyan-300 font-black text-xs flex items-center justify-center gap-2 transition-all"
+              className="flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-purple-600/30 border border-purple-500/50 hover:bg-purple-600/40 text-purple-300 font-black text-xs flex items-center justify-center gap-2 transition-all"
             >
-              <ShieldCheck className="w-4 h-4 text-cyan-400" />
+              <ShieldCheck className="w-4 h-4 text-purple-400" />
               <span>Admin Panelga O'tish</span>
             </button>
           )}
@@ -358,6 +372,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         >
           <Wallet className="w-4 h-4 text-emerald-400" />
           <span>Balans va Tarix</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('coins')}
+          className={`px-5 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all ${
+            activeTab === 'coins' ? 'bg-amber-500 border border-amber-400 text-slate-950 shadow-lg shadow-amber-500/20' : 'bg-slate-950 text-amber-400 hover:text-amber-300'
+          }`}
+        >
+          <Coins className="w-4 h-4" />
+          <span>Coin & Referal ({user.coins || 0})</span>
         </button>
 
         <button
@@ -580,6 +604,121 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         </div>
       )}
 
+      {/* TAB 2.5: COIN & REFERRAL SYSTEM */}
+      {activeTab === 'coins' && (
+        <div className="space-y-6">
+          
+          {/* Coin Balance Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-950/60 via-slate-900 to-slate-900 border border-amber-500/40 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl">
+            <div className="flex items-center gap-4 text-center sm:text-left">
+              <div className="w-16 h-16 rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                <Coins className="w-8 h-8" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-amber-300/80 uppercase tracking-wider block">Coin Balansingiz</span>
+                <h3 className="text-3xl font-black text-white flex items-center gap-2">
+                  <span>{user.coins || 0}</span>
+                  <span className="text-sm font-bold text-amber-400">Tangalar</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">Manga va premium boblarni ochish uchun foydalaning</p>
+              </div>
+            </div>
+
+            <button
+              onClick={onOpenCoinModal}
+              className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs shadow-xl shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <Coins className="w-4 h-4" />
+              <span>Coin Balansini To'ldirish</span>
+            </button>
+          </div>
+
+          {/* Referral Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-purple-500/30 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-white flex items-center gap-2">
+                  <Share2 className="w-5 h-5 text-purple-400" />
+                  <span>Referal Tizim (Do'stlarni Taklif Qilish)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Har bir taklif qilingan do'stingiz birinchi marta Coin sotib olganida sizga <strong className="text-amber-400">10 Coin Bonus</strong> beriladi!
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-[11px] text-slate-400 font-medium">Sizning Referal Kodingiz:</span>
+                <p className="text-lg font-mono font-black text-purple-300">{user.referralCode || `SNP-${user.id}`}</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-[11px] text-slate-400 font-medium">Taklif Qilingan Do'stlar:</span>
+                <p className="text-lg font-black text-emerald-400">{user.totalReferrals || 0} kishi</p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-[11px] text-slate-400 font-medium">Ishlangan Referal Bonus:</span>
+                <p className="text-lg font-black text-amber-400">{user.referralBonusEarned || 0} Coin</p>
+              </div>
+            </div>
+
+            {/* Referral Link Copy Bar */}
+            <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+              <label className="text-xs font-bold text-slate-300 block">Sizning Shaxsiy Referal Havolangiz:</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={`https://snpaiuz.uz/#ref=${user.referralCode || `SNP-${user.id}`}`}
+                  className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-300 font-mono focus:outline-none"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`https://snpaiuz.uz/#ref=${user.referralCode || `SNP-${user.id}`}`);
+                    setCopiedRefLink(true);
+                    setTimeout(() => setCopiedRefLink(false), 2000);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg shadow-purple-600/30"
+                >
+                  {copiedRefLink ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+                  <span>{copiedRefLink ? 'Nusxalandi!' : 'Nusxalash'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Coin History */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-slate-900 border border-slate-800 space-y-4 shadow-2xl">
+            <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+              <Coins className="w-4 h-4 text-amber-400" />
+              <span>Coin Harakatlari Tarixi</span>
+            </h3>
+
+            {(!user.coinHistory || user.coinHistory.length === 0) ? (
+              <p className="py-8 text-center text-slate-500 text-xs">Hali coin tranzaksiyalari yo'q</p>
+            ) : (
+              <div className="space-y-2">
+                {user.coinHistory.map((tx) => (
+                  <div key={tx.id} className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-bold text-white block">{tx.description}</span>
+                      <span className="text-[10px] text-slate-500">{new Date(tx.createdAt).toLocaleString('uz-UZ')}</span>
+                    </div>
+
+                    <span className={`font-mono font-bold ${tx.amount > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {tx.amount > 0 ? '+' : ''}{tx.amount} Coin
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
+
       {/* TAB 3: WATCHLIST */}
       {activeTab === 'watchlist' && (
         <div>
@@ -787,6 +926,54 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
                   Parolni Yangilash
                 </button>
               </form>
+            </div>
+
+            {/* Support Channels & Assistance */}
+            <div className="pt-6 border-t border-slate-800 space-y-3">
+              <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                <Send className="w-4 h-4 text-cyan-400" />
+                <span>Qo'llab-quvvatlash va Yordam (Support)</span>
+              </h4>
+              <p className="text-xs text-slate-400">
+                Savollaringiz, takliflaringiz yoki texnik muammolar bo'yicha ma'murlarga bog'laning:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <a
+                  href={socialSettings.telegramUrl || 'https://t.me/SenpaiUzz'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-500/50 flex items-center gap-3 transition-all group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-cyan-600/20 text-cyan-400 flex items-center justify-center shrink-0">
+                    <Send className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block group-hover:text-cyan-300">Telegram Support</span>
+                    <span className="text-[11px] text-cyan-400 font-mono">{socialSettings.telegramUsername || '@SenpaiUzz'}</span>
+                  </div>
+                </a>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-purple-600/20 text-purple-400 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-xs font-bold text-white block">Email Pochta</span>
+                    <span className="text-[11px] text-slate-400 font-mono truncate block">{socialSettings.email || 'support@anisenpaiuz.com'}</span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-white block">Ishonch Telefoni</span>
+                    <span className="text-[11px] text-slate-400 font-mono">{socialSettings.phone || '+998 (90) 123-45-67'}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="pt-4 border-t border-slate-800">

@@ -21,6 +21,16 @@ interface AuthContextType {
   markNotificationRead: (id: string) => void;
   clearAllNotifications: () => void;
   isFavorite: (animeId: string) => boolean;
+  updateUserCoinsState: (
+    coinDelta: number,
+    type: 'topup' | 'spend' | 'referral_bonus' | 'admin_adjust',
+    description: string,
+    unlockedChapterId?: string,
+    unlockedMangaId?: string,
+    coinPackagePurchased?: any,
+    bookmarksUpdate?: string[],
+    readingHistoryUpdate?: any[]
+  ) => void;
 }
 
 const DEFAULT_SUPER_USER: User = {
@@ -44,6 +54,24 @@ const DEFAULT_SUPER_USER: User = {
       createdAt: '2024-01-01'
     }
   ],
+  coins: 50,
+  coinHistory: [
+    {
+      id: 'coin-tx-seed-1',
+      userId: '8431057',
+      amount: 50,
+      type: 'topup',
+      description: 'Boshlang\'ich Admin Coin Bonusi',
+      createdAt: new Date().toISOString()
+    }
+  ],
+  referralCode: 'SNP-ADM84',
+  totalReferrals: 0,
+  referralBonusEarned: 0,
+  unlockedChapters: [],
+  unlockedMangas: [],
+  mangaBookmarks: [],
+  mangaReadingHistory: [],
   notifications: [
     {
       id: 'n-super-1',
@@ -250,6 +278,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ],
       favorites: [],
       watchHistory: [],
+      coins: 20,
+      coinHistory: [],
+      referralCode: 'SNP-G' + Math.floor(1000 + Math.random() * 9000),
+      totalReferrals: 0,
+      referralBonusEarned: 0,
+      unlockedChapters: [],
+      unlockedMangas: [],
+      mangaBookmarks: [],
+      mangaReadingHistory: [],
       createdAt: new Date().toISOString()
     };
     setUser(googleUser);
@@ -415,6 +452,74 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return user ? user.favorites.includes(animeId) : false;
   };
 
+  const updateUserCoinsState = (
+    coinDelta: number,
+    type: 'topup' | 'spend' | 'referral_bonus' | 'admin_adjust',
+    description: string,
+    unlockedChapterId?: string,
+    unlockedMangaId?: string,
+    coinPackagePurchased?: any,
+    bookmarksUpdate?: string[],
+    readingHistoryUpdate?: any[]
+  ) => {
+    if (!user) return;
+
+    let currentCoins = user.coins ?? 0;
+    let newCoins = currentCoins + coinDelta;
+    if (newCoins < 0) newCoins = 0;
+
+    const coinTx = {
+      id: 'coin-tx-' + Date.now(),
+      userId: user.id,
+      amount: coinDelta,
+      type,
+      description,
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedUnlockedChapters = unlockedChapterId
+      ? Array.from(new Set([...(user.unlockedChapters || []), unlockedChapterId]))
+      : (user.unlockedChapters || []);
+
+    const updatedUnlockedMangas = unlockedMangaId
+      ? Array.from(new Set([...(user.unlockedMangas || []), unlockedMangaId]))
+      : (user.unlockedMangas || []);
+
+    const updatedBookmarks = bookmarksUpdate !== undefined
+      ? bookmarksUpdate
+      : (user.mangaBookmarks || []);
+
+    const updatedReadingHistory = readingHistoryUpdate !== undefined
+      ? readingHistoryUpdate
+      : (user.mangaReadingHistory || []);
+
+    const newNotif = coinDelta !== 0 ? {
+      id: 'n-coin-' + Date.now(),
+      title: coinDelta > 0 ? '🪙 Coin hisobingizga tushdi!' : '🪙 Coin sarflandi',
+      message: `${description} (${coinDelta > 0 ? '+' : ''}${coinDelta} Coin)`,
+      date: 'Hozir',
+      read: false,
+      type: 'balance' as const
+    } : null;
+
+    const updatedNotifications = newNotif
+      ? [newNotif, ...(user.notifications || [])]
+      : (user.notifications || []);
+
+    const updatedUser: User = {
+      ...user,
+      coins: newCoins,
+      coinHistory: [coinTx, ...(user.coinHistory || [])],
+      unlockedChapters: updatedUnlockedChapters,
+      unlockedMangas: updatedUnlockedMangas,
+      mangaBookmarks: updatedBookmarks,
+      mangaReadingHistory: updatedReadingHistory,
+      notifications: updatedNotifications
+    };
+
+    setUser(updatedUser);
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -435,7 +540,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updateProfile,
       markNotificationRead,
       clearAllNotifications,
-      isFavorite
+      isFavorite,
+      updateUserCoinsState
     }}>
       {children}
     </AuthContext.Provider>

@@ -39,8 +39,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ title, url = window.loca
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + ' - SnpaiUz Anime Platformasida tomosha qiling!')}`;
-  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + ' on SnpaiUz')}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + ' - AniSenpaiUz Anime Platformasida tomosha qiling!')}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title + ' on AniSenpaiUz')}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">

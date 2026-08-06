@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Anime, Comment, AdConfig, Report } from '../types';
+import { Anime, Comment, AdConfig, Report, SocialSettings, Supporter } from '../types';
 import { INITIAL_ANIME_DATA } from '../data/mockAnimeData';
+import { INITIAL_SUPPORTERS } from '../data/mockSupportersData';
 
 interface FilterState {
   genre: string;
@@ -47,7 +48,28 @@ interface AnimeContextType {
   platformStats: PlatformStats;
   fetchPlatformStats: () => Promise<void>;
   recordView: (animeId: string, episodeId?: string, userId?: string) => Promise<void>;
+  socialSettings: SocialSettings;
+  updateSocialSettings: (settings: Partial<SocialSettings>) => void;
+  supporters: Supporter[];
+  addSupporter: (supporter: Partial<Supporter>) => void;
+  updateSupporter: (id: string, updates: Partial<Supporter>) => void;
+  deleteSupporter: (id: string) => void;
 }
+
+const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
+  telegramUsername: '@SenpaiUzz',
+  telegramUrl: 'https://t.me/SenpaiUzz',
+  email: 'support@anisenpaiuz.com',
+  phone: '+998 (90) 123-45-67',
+  discordUrl: 'https://discord.gg/anisenpaiuz',
+  instagramUrl: 'https://instagram.com/anisenpaiuz',
+  facebookUrl: 'https://facebook.com/anisenpaiuz',
+  youtubeUrl: 'https://youtube.com/@anisenpaiuz',
+  websiteUrl: 'https://anisenpaiuz.com',
+  telegramBannerTitle: 'AniSenpaiUz Telegram Kanaliga A\'zo Bo\'ling!',
+  telegramBannerDesc: 'Eng so\'nggi va yangi anime qismlari, premyeralar va yangiliklardan birinchilardan bo\'lib xabardor bo\'ling!',
+  showTelegramBanner: true
+};
 
 const INITIAL_COMMENTS: Record<string, Comment[]> = {};
 
@@ -55,8 +77,8 @@ const DEFAULT_ADS: AdConfig[] = [
   {
     id: 'ad-1',
     type: 'banner',
-    title: 'SnpaiUz Telegram Kanaliga A\'zo Bo\'ling!',
-    targetUrl: 'https://t.me/SnpaiUz',
+    title: 'AniSenpaiUz Telegram Kanaliga A\'zo Bo\'ling!',
+    targetUrl: 'https://t.me/SenpaiUzz',
     active: true,
     position: 'header'
   }
@@ -93,6 +115,33 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [ads] = useState<AdConfig[]>(DEFAULT_ADS);
   const [reports, setReports] = useState<Report[]>([]);
+
+  const [socialSettings, setSocialSettings] = useState<SocialSettings>(() => {
+    try {
+      const saved = localStorage.getItem('snpaiuz_social_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          return { ...DEFAULT_SOCIAL_SETTINGS, ...parsed };
+        }
+      }
+    } catch (e) {
+      console.error('Failed to parse social settings:', e);
+    }
+    return DEFAULT_SOCIAL_SETTINGS;
+  });
+
+  const updateSocialSettings = (newSettings: Partial<SocialSettings>) => {
+    setSocialSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      try {
+        localStorage.setItem('snpaiuz_social_settings', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save social settings:', e);
+      }
+      return updated;
+    });
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({
@@ -270,6 +319,49 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => clearInterval(interval);
   }, []);
 
+  const [supporters, setSupporters] = useState<Supporter[]>(() => {
+    try {
+      const saved = localStorage.getItem('senpaiuz_supporters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error('Failed to parse supporters:', e);
+    }
+    return INITIAL_SUPPORTERS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('senpaiuz_supporters', JSON.stringify(supporters));
+    } catch (e) {
+      console.error('Failed to save supporters:', e);
+    }
+  }, [supporters]);
+
+  const addSupporter = (data: Partial<Supporter>) => {
+    const newSupporter: Supporter = {
+      id: 'supp-' + Date.now(),
+      nickname: data.nickname || 'Anonim Supporter',
+      avatar: data.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+      isVip: data.isVip ?? false,
+      amount: data.amount || 10000,
+      dateSupported: data.dateSupported || new Date().toISOString().split('T')[0],
+      visible: data.visible ?? true,
+      displayOrder: data.displayOrder ?? (supporters.length + 1)
+    };
+    setSupporters(prev => [...prev, newSupporter]);
+  };
+
+  const updateSupporter = (id: string, updates: Partial<Supporter>) => {
+    setSupporters(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+  };
+
+  const deleteSupporter = (id: string) => {
+    setSupporters(prev => prev.filter(s => s.id !== id));
+  };
+
   const incrementViews = (animeId: string) => {
     setAnimeList(prev => prev.map(a => {
       if (a.id === animeId) {
@@ -302,7 +394,13 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       incrementViews,
       platformStats,
       fetchPlatformStats,
-      recordView
+      recordView,
+      socialSettings,
+      updateSocialSettings,
+      supporters,
+      addSupporter,
+      updateSupporter,
+      deleteSupporter
     }}>
       {children}
     </AnimeContext.Provider>

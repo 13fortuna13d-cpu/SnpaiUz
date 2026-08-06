@@ -29,7 +29,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ tab = 'dmca' }) => {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      <SeoHead title="SnpaiUz - Hujjatlar va Qo'llab-quvvatlash" />
+      <SeoHead title="AniSenpaiUz - Hujjatlar va Qo'llab-quvvatlash" />
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-slate-800 pb-3">
@@ -56,10 +56,10 @@ export const LegalPage: React.FC<LegalPageProps> = ({ tab = 'dmca' }) => {
               DMCA Copyright Policy
             </h2>
             <p>
-              SnpaiUz digital copyright qonunchiligiga to'liq rioya qiladi. Agar platformadagi biron-bir kontent mualliflik huquqingizni buzayotgan bo'lsa, legal@snpaiuz.com manziliga DMCA ariza yuborishingiz mumkin.
+              AniSenpaiUz digital copyright qonunchiligiga to'liq rioya qiladi. Agar platformadagi biron-bir kontent mualliflik huquqingizni buzayotgan bo'lsa, dmca@anisenpaiuz.com manziliga DMCA ariza yuborishingiz mumkin.
             </p>
             <p className="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-cyan-300">
-              Email: dmca@snpaiuz.com | Response Time: 24-48 hours.
+              Email: dmca@anisenpaiuz.com | Response Time: 24-48 hours.
             </p>
           </div>
         )}
@@ -68,7 +68,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ tab = 'dmca' }) => {
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white">Maxfiylik Siyosati (Privacy Policy)</h2>
             <p>
-              SnpaiUz foydalanuvchilarning shaxsiy ma'lumotlari xavfsizligini ta'minlaydi. Biz parollarni shifrlangan holda saqlaymiz va uchinchi shaxslarga bermaymiz.
+              AniSenpaiUz foydalanuvchilarning shaxsiy ma'lumotlari xavfsizligini ta'minlaydi. Biz parollarni shifrlangan holda saqlaymiz va uchinchi shaxslarga bermaymiz.
             </p>
           </div>
         )}
@@ -77,7 +77,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ tab = 'dmca' }) => {
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-white">Foydalanish Shartlari (Terms of Service)</h2>
             <p>
-              SnpaiUz xizmatlaridan foydalanish orqali siz platforma qoidalariga rozi bo'lasiz. Nojo'ya fikrlar bildirish va botlardan foydalanish taqiqlanadi.
+              AniSenpaiUz xizmatlaridan foydalanish orqali siz platforma qoidalariga rozi bo'lasiz. Nojo'ya fikrlar bildirish va botlardan foydalanish taqiqlanadi.
             </p>
           </div>
         )}
@@ -92,7 +92,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({ tab = 'dmca' }) => {
               </div>
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
                 <p className="font-bold text-white">Anime qanday yuklab olinadi?</p>
-                <p className="text-slate-400 mt-1">SnpaiUz VIP a'zolari uchun oflayn yuklab olish tugmasi pleyer ostida mavjud.</p>
+                <p className="text-slate-400 mt-1">AniSenpaiUz VIP a'zolari uchun oflayn yuklab olish tugmasi pleyer ostida mavjud.</p>
               </div>
             </div>
           </div>

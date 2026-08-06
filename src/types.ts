@@ -1,3 +1,18 @@
+export interface SocialSettings {
+  telegramUsername: string;
+  telegramUrl: string;
+  email: string;
+  phone: string;
+  discordUrl: string;
+  instagramUrl: string;
+  facebookUrl: string;
+  youtubeUrl: string;
+  websiteUrl: string;
+  telegramBannerTitle: string;
+  telegramBannerDesc: string;
+  showTelegramBanner: boolean;
+}
+
 export type Language = 'uz' | 'en' | 'ru';
 
 export type AnimeStatus = 'Ongoing' | 'Completed' | 'Upcoming';
@@ -98,6 +113,64 @@ export interface NotificationItem {
   link?: string;
 }
 
+export interface MangaChapter {
+  id: string;
+  mangaId: string;
+  chapterNumber: number;
+  title: string;
+  pages: string[]; // array of image URLs
+  isFree: boolean;
+  coinPrice: number; // e.g. 5
+  views: number;
+  createdAt: string;
+}
+
+export interface Manga {
+  id: string;
+  slug: string;
+  title: {
+    uz: string;
+    en: string;
+    jp: string;
+  };
+  originalTitle: string;
+  synopsis: Record<Language, string>;
+  poster: string;
+  banner: string;
+  author: string;
+  artist: string;
+  genres: string[];
+  tags: string[];
+  status: 'Ongoing' | 'Completed' | 'Upcoming';
+  language: string;
+  releaseYear: number;
+  rating: number; // 0 - 10
+  views: number;
+  likes: number;
+  bookmarksCount: number;
+  isPremium?: boolean;
+  coinPrice?: number;
+  chapters: MangaChapter[];
+  createdAt: string;
+}
+
+export interface CoinTransaction {
+  id: string;
+  userId: string;
+  amount: number; // positive for earn/topup, negative for spend
+  type: 'topup' | 'spend' | 'referral_bonus' | 'admin_adjust';
+  description: string;
+  createdAt: string;
+}
+
+export interface CoinPackage {
+  id: string;
+  coins: number;
+  priceUZS: number;
+  bonusCoins?: number;
+  popular?: boolean;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -110,6 +183,22 @@ export interface User {
   vipExpiresAt?: string;
   balanceUZS: number;
   balanceHistory: Transaction[];
+  coins: number;
+  coinHistory: CoinTransaction[];
+  referralCode: string;
+  referredBy?: string;
+  totalReferrals: number;
+  referralBonusEarned: number;
+  unlockedChapters: string[]; // chapterIds
+  unlockedMangas: string[]; // mangaIds
+  mangaBookmarks: string[]; // mangaIds
+  mangaReadingHistory: {
+    mangaId: string;
+    chapterId: string;
+    chapterNumber: number;
+    pageIndex: number;
+    updatedAt: string;
+  }[];
   notifications: NotificationItem[];
   favorites: string[]; // animeIds
   watchHistory: {
@@ -141,6 +230,17 @@ export interface Report {
   reportedBy: string;
   createdAt: string;
   status: 'pending' | 'resolved' | 'dismissed';
+}
+
+export interface Supporter {
+  id: string;
+  nickname: string;
+  avatar: string;
+  isVip?: boolean;
+  amount?: number;
+  dateSupported?: string;
+  visible: boolean;
+  displayOrder: number;
 }
 
 export interface SystemStats {

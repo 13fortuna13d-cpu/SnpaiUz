@@ -11,18 +11,18 @@ interface SeoHeadProps {
 }
 
 export const SeoHead: React.FC<SeoHeadProps> = ({
-  title = 'SnpaiUz - Professional Anime Streaming Platform',
-  description = 'SnpaiUz - O\'zbekistonda professional anime tomosha qilish platformasi. Full HD 1080p sifat, O\'zbekcha dublyaj va subtitrlar.',
-  keywords = 'SnpaiUz, anime uzbekcha, anime subtitr, anime dublyaj, solo leveling uzbekcha, demon slayer, naruto, one piece, anime watch uzbekistan',
+  title = 'AniSenpaiUz - Professional Anime & Manga Platformasi',
+  description = 'AniSenpaiUz - O\'zbekistonda professional anime va manga platformasi. Full HD 1080p sifat, O\'zbekcha dublyaj va subtitrlar.',
+  keywords = 'AniSenpaiUz, anime uzbekcha, manga uzbekcha, anime subtitr, anime dublyaj, solo leveling uzbekcha, demon slayer, naruto, one piece, anime watch uzbekistan',
   image = 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1200&q=80',
-  url = 'https://snpaiuz.com',
+  url = 'https://anisenpaiuz.com',
   animeData
 }) => {
   const { language } = useLanguage();
 
   useEffect(() => {
     // Dynamic document title
-    document.title = title.includes('SnpaiUz') ? title : `${title} - SnpaiUz`;
+    document.title = title.includes('AniSenpaiUz') ? title : `${title} - AniSenpaiUz`;
 
     // Helper to update meta tags
     const setMeta = (name: string, content: string, property = false) => {
@@ -44,7 +44,7 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     setMeta('og:description', description, true);
     setMeta('og:image', image, true);
     setMeta('og:url', url, true);
-    setMeta('og:site_name', 'SnpaiUz', true);
+    setMeta('og:site_name', 'AniSenpaiUz', true);
     setMeta('og:type', animeData ? 'video.tv_show' : 'website', true);
 
     // Twitter
@@ -92,11 +92,11 @@ export const SeoHead: React.FC<SeoHeadProps> = ({
     } : {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      'name': 'SnpaiUz',
-      'url': 'https://snpaiuz.com',
+      'name': 'AniSenpaiUz',
+      'url': 'https://anisenpaiuz.com',
       'potentialAction': {
         '@type': 'SearchAction',
-        'target': 'https://snpaiuz.com/catalog?search={search_term_string}',
+        'target': 'https://anisenpaiuz.com/catalog?search={search_term_string}',
         'query-input': 'required name=search_term_string'
       }
     };

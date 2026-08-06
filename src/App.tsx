@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { LanguageProvider } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { AnimeProvider } from './context/AnimeContext';
+import { MangaProvider } from './context/MangaContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { Footer } from './components/Footer';
 import { AuthModal } from './components/AuthModal';
 import { PaymentModal } from './components/PaymentModal';
+import { CoinTopupModal } from './components/CoinTopupModal';
 import { ShareModal } from './components/ShareModal';
 import { RatingModal } from './components/RatingModal';
 import { VoiceSearchModal } from './components/VoiceSearchModal';
@@ -21,6 +23,9 @@ import { CategoriesPage } from './pages/CategoriesPage';
 import { FavoritesPage } from './pages/FavoritesPage';
 import { AnimeDetailPage } from './pages/AnimeDetailPage';
 import { WatchPage } from './pages/WatchPage';
+import { MangaCatalogPage } from './pages/MangaCatalogPage';
+import { MangaDetailPage } from './pages/MangaDetailPage';
+import { MangaReaderPage } from './pages/MangaReaderPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 import { LegalPage } from './pages/LegalPage';
@@ -39,6 +44,14 @@ export default function App() {
       const parts = hash.split('/');
       return { page: 'watch', params: { slug: parts[1] || 'solo-leveling', epId: parts[2] } };
     }
+    if (hash.startsWith('manga-detail/')) {
+      const parts = hash.split('/');
+      return { page: 'manga-detail', params: { slug: parts[1] || 'solo-leveling-manhwa' } };
+    }
+    if (hash.startsWith('manga-reader/')) {
+      const parts = hash.split('/');
+      return { page: 'manga-reader', params: { slug: parts[1] || 'solo-leveling-manhwa', chapterId: parts[2] } };
+    }
     if (hash.startsWith('categories')) {
       const genre = new URLSearchParams(hash.split('?')[1] || '').get('genre');
       return { page: 'categories', params: { genre: genre || undefined } };
@@ -52,7 +65,7 @@ export default function App() {
       return { page: 'legal', params: { doc: doc || undefined } };
     }
 
-    const validPages = ['home', 'catalog', 'categories', 'favorites', 'profile', 'admin', 'legal'];
+    const validPages = ['home', 'catalog', 'manga', 'manga-detail', 'manga-reader', 'categories', 'favorites', 'profile', 'admin', 'legal'];
     if (validPages.includes(hash)) {
       return { page: hash, params: {} };
     }
@@ -66,6 +79,7 @@ export default function App() {
   // Modals & Drawers
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isVipOpen, setIsVipOpen] = useState(false);
+  const [isCoinOpen, setIsCoinOpen] = useState(false);
   const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [trailerUrl, setTrailerUrl] = useState<string | null>(null);
@@ -82,6 +96,10 @@ export default function App() {
       hash = `#anime/${params.slug}`;
     } else if (page === 'watch' && params.slug) {
       hash = `#watch/${params.slug}${params.epId ? `/${params.epId}` : ''}`;
+    } else if (page === 'manga-detail' && params.slug) {
+      hash = `#manga-detail/${params.slug}`;
+    } else if (page === 'manga-reader' && params.slug) {
+      hash = `#manga-reader/${params.slug}${params.chapterId ? `/${params.chapterId}` : ''}`;
     } else if (page === 'categories' && params.genre) {
       hash = `#categories?genre=${encodeURIComponent(params.genre)}`;
     } else if (page === 'profile' && params.tab) {
@@ -151,6 +169,7 @@ export default function App() {
         <LanguageProvider>
           <AuthProvider>
             <AnimeProvider>
+              <MangaProvider>
             <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-600 selection:text-white flex flex-col justify-between pb-16 md:pb-0 overflow-x-clip w-full max-w-full">
             
             {/* Header */}
@@ -174,6 +193,27 @@ export default function App() {
 
               {activePage === 'catalog' && (
                 <CatalogPage onNavigate={handleNavigate} />
+              )}
+
+              {activePage === 'manga' && (
+                <MangaCatalogPage onNavigate={handleNavigate} />
+              )}
+
+              {activePage === 'manga-detail' && (
+                <MangaDetailPage
+                  slug={pageParams.slug || 'solo-leveling-manhwa'}
+                  onNavigate={handleNavigate}
+                  onOpenCoinModal={() => setIsCoinOpen(true)}
+                />
+              )}
+
+              {activePage === 'manga-reader' && (
+                <MangaReaderPage
+                  mangaSlug={pageParams.slug || 'solo-leveling-manhwa'}
+                  chapterId={pageParams.chapterId}
+                  onNavigate={handleNavigate}
+                  onOpenCoinModal={() => setIsCoinOpen(true)}
+                />
               )}
 
               {activePage === 'categories' && (
@@ -215,6 +255,7 @@ export default function App() {
                   initialTab={pageParams.tab || 'overview'}
                   onNavigate={handleNavigate}
                   onOpenVip={() => setIsVipOpen(true)}
+                  onOpenCoinModal={() => setIsCoinOpen(true)}
                 />
               )}
 
@@ -244,6 +285,10 @@ export default function App() {
 
             {isVipOpen && (
               <PaymentModal onClose={() => setIsVipOpen(false)} />
+            )}
+
+            {isCoinOpen && (
+              <CoinTopupModal onClose={() => setIsCoinOpen(false)} />
             )}
 
             {isNotificationsOpen && (
@@ -299,6 +344,7 @@ export default function App() {
             <PwaInstallPrompt />
 
           </div>
+              </MangaProvider>
         </AnimeProvider>
       </AuthProvider>
     </LanguageProvider>

@@ -1,8 +1,11 @@
 import React from 'react';
-import { Play, Flame, Star, ChevronRight, Clock, Award, Compass, BarChart3, Users, Eye, Heart, Activity, UserPlus, TrendingUp } from 'lucide-react';
+import { Play, Flame, Star, ChevronRight, Clock, Award, Compass, BarChart3, Users, Eye, Heart, Activity, UserPlus, TrendingUp, BookOpen, Coins } from 'lucide-react';
 import { HeroSlider } from '../components/HeroSlider';
 import { AnimeCard } from '../components/AnimeCard';
+import { TelegramBanner } from '../components/TelegramBanner';
+import { SupportersSection } from '../components/SupportersSection';
 import { useAnime } from '../context/AnimeContext';
+import { useManga } from '../context/MangaContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { GENRE_LIST } from '../data/mockAnimeData';
@@ -16,6 +19,7 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenTrailer }) => {
   const { t, tGenre, language, getAnimeTitle } = useLanguage();
   const { animeList, ads, setFilters, platformStats } = useAnime();
+  const { mangas } = useManga();
   const { user } = useAuth();
 
   const featured = animeList.filter(a => a.isFeatured || a.isTrending);
@@ -34,23 +38,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenTrailer })
   return (
     <div className="space-y-12">
       <SeoHead
-        title="SnpaiUz - Professional Anime Streaming Platform"
-        description="SnpaiUz - O'zbekistonda eng so'nggi va ommabop animelarni Full HD 1080p sifatda, o'zbekcha dublyajda tomosha qiling."
+        title="AniSenpaiUz - Professional Anime & Manga Platformasi"
+        description="AniSenpaiUz - O'zbekistonda eng so'nggi va ommabop animelarni Full HD 1080p sifatda, o'zbekcha dublyajda va mangalarni o'zbekcha mutolaa qiling."
       />
 
-      {/* Ad Banner Widget */}
-      {headerAd && (
-        <div className="max-w-7xl mx-auto px-4">
-          <a
-            href={headerAd.targetUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="block p-4 rounded-2xl bg-gradient-to-r from-purple-900/40 via-cyan-900/30 to-slate-900 border border-purple-500/30 hover:border-purple-500/60 transition-all text-center text-xs font-semibold text-purple-200"
-          >
-            📢 {headerAd.title}
-          </a>
-        </div>
-      )}
+      {/* Official Telegram Banner Block */}
+      <TelegramBanner />
 
       {/* Hero Featured Carousel or Empty Catalog Banner */}
       {animeList.length > 0 ? (
@@ -215,6 +208,50 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenTrailer })
         </div>
       </section>
 
+      {/* Manga & Manhwa Showcase Section */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-purple-400" />
+            <span>Ommabop Mangalar va Manhwalar</span>
+          </h2>
+          <button
+            onClick={() => onNavigate('manga')}
+            className="text-xs text-purple-400 hover:underline flex items-center gap-1 font-semibold"
+          >
+            <span>Barchasi</span>
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {mangas.map((manga) => (
+            <div
+              key={manga.id}
+              onClick={() => onNavigate('manga-detail', { slug: manga.slug })}
+              className="bg-slate-900/80 rounded-2xl p-2.5 border border-slate-800 hover:border-purple-500/50 cursor-pointer transition-all space-y-2 group"
+            >
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                <img src={manga.poster} alt={manga.title.uz} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-purple-600/90 text-white font-black text-[10px] shadow-md">
+                  MANGA
+                </span>
+                <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded-full bg-slate-950/80 text-amber-400 font-extrabold text-[10px] border border-slate-800">
+                  ⭐ {manga.rating}
+                </span>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-white text-xs line-clamp-1 group-hover:text-purple-300 transition-colors">
+                  {manga.title[language] || manga.title.uz}
+                </h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">{manga.chapters.length} ta bob</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Genre Categories Chips */}
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -367,6 +404,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onOpenTrailer })
           </div>
         </div>
       </section>
+
+      {/* Supporters (Ovoz berganlar) Section */}
+      <SupportersSection />
 
     </div>
   );

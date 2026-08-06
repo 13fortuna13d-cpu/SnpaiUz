@@ -70,7 +70,7 @@ export const AnimeDetailPage: React.FC<AnimeDetailPageProps> = ({
   return (
     <div className="space-y-10">
       <SeoHead
-        title={`${title} (SnpaiUz)`}
+        title={`${title} (AniSenpaiUz)`}
         description={synopsis.slice(0, 160)}
         image={anime.poster}
         animeData={anime}

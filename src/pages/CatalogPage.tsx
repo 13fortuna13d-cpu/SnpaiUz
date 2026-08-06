@@ -61,7 +61,7 @@ export const CatalogPage: React.FC<CatalogPageProps> = ({ onNavigate }) => {
   return (
     <div className="space-y-8">
       <SeoHead
-        title={`${t('catalog.title')} (SnpaiUz)`}
+        title={`${t('catalog.title')} (AniSenpaiUz)`}
         description="Barcha sara animelarni janr, yil, reyting va dublyaj bo'yicha saralab toping va tomosha qiling."
       />
 
