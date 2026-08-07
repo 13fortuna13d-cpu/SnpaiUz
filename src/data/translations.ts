@@ -59,7 +59,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'anime.trailer': 'Treyder',
     'anime.screenshots': 'Skrinshotlar',
     'anime.related': 'O\'xshash animelar',
-    'anime.recommended': 'SnpaiUz tavsiya etadi',
+    'anime.recommended': 'AniSenpaiUz tavsiya etadi',
     'anime.rate_this': 'Baholang',
     'anime.views': 'marta ko\'rildi',
     'anime.votes': 'ovoz',
@@ -84,7 +84,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'player.sub_uz': 'O\'zbekcha Sub',
     'player.sub_en': 'Inglizcha Sub',
     'player.sub_ru': 'Ruscha Sub',
-    'player.dub_uz': 'SnpaiUz Dub (O\'zbek)',
+    'player.dub_uz': 'AniSenpaiUz Dub (O\'zbek)',
     'player.dub_jp': 'Asl yaponcha',
 
     // Filter & Catalog
@@ -154,11 +154,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'comments.no_comments': 'Hali fikrlar yo\'q. Birinchi bo\'lib fikr bildiring!',
 
     // VIP & Payment
-    'vip.title': 'SnpaiUz Premium VIP',
+    'vip.title': 'AniSenpaiUz Premium VIP',
     'vip.subtitle': 'Cheklovlarsiz Full HD 1080p anime tomosha qiling va reklamalardan xalos bo\'ling!',
     'vip.feature1': 'Reklamalarsiz ultra tez streaming',
     'vip.feature2': 'Full HD 1080p va 4K sifat',
-    'vip.feature3': 'Eksklyuziv SnpaiUz O\'zbekcha Dublyaj',
+    'vip.feature3': 'Eksklyuziv AniSenpaiUz O\'zbekcha Dublyaj',
     'vip.feature4': 'Yangi qismlarni birinchi bo\'lib tomosha qilish',
     'vip.feature5': 'Oflayn yuklab olish imkoniyati',
     'vip.plan_monthly': '1 Oylik VIP',
@@ -187,7 +187,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'profile.registered': 'Ro\'yxatdan o\'tilgan:',
 
     // Admin Panel
-    'admin.title': 'SnpaiUz Admin Boshqaruv Paneli',
+    'admin.title': 'AniSenpaiUz Admin Boshqaruv Paneli',
     'admin.dashboard': 'Dashboard',
     'admin.manage_anime': 'Animelarni boshqarish',
     'admin.add_anime': 'Yangi Anime qo\'shish',
@@ -313,7 +313,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Foydalanish shartlari',
     'footer.contact': 'Aloqa',
     'footer.faq': 'Ko\'p beriladigan savollar',
-    'footer.rights': 'Barcha huquqlar himoyalangan. SnpaiUz Anime Platformasi.'
+    'footer.rights': 'Barcha huquqlar himoyalangan. AniSenpaiUz Anime Platformasi.'
   },
   en: {
     // Navigation & Header
@@ -321,7 +321,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.catalog': 'Catalog',
     'nav.top': 'Top Anime',
     'nav.schedule': 'Schedule',
-    'nav.vip': 'SnpaiUz VIP',
+    'nav.vip': 'AniSenpaiUz VIP',
     'nav.admin': 'Admin Panel',
     'nav.categories': 'Categories',
     'nav.favorites': 'Favorites',
@@ -342,7 +342,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.password': 'Password',
     'auth.forgot_password': 'Forgot Password?',
     'auth.email_verification': 'Verification Code',
-    'auth.welcome_back': 'Welcome back to SnpaiUz!',
+    'auth.welcome_back': 'Welcome back to AniSenpaiUz!',
     'auth.create_account': 'Create a new account',
     'auth.login_required': 'Please sign in to view your profile',
     'auth.back_home': 'Back to Home',
@@ -351,7 +351,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.watch_now': 'Watch Now',
     'hero.add_watchlist': 'Add to Favorites',
     'hero.in_watchlist': 'In Favorites',
-    'hero.top_pick': 'SnpaiUz Top Pick',
+    'hero.top_pick': 'AniSenpaiUz Top Pick',
     'home.continue_watching': 'Continue Watching',
     'home.trending': '🔥 Trending Anime',
     'home.popular': '⭐ Most Popular',
@@ -373,7 +373,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'anime.trailer': 'Trailer',
     'anime.screenshots': 'Screenshots',
     'anime.related': 'Related Anime',
-    'anime.recommended': 'Recommended by SnpaiUz',
+    'anime.recommended': 'Recommended by AniSenpaiUz',
     'anime.rate_this': 'Rate this',
     'anime.views': 'views',
     'anime.votes': 'votes',
@@ -398,7 +398,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'player.sub_uz': 'Uzbek Sub',
     'player.sub_en': 'English Sub',
     'player.sub_ru': 'Russian Sub',
-    'player.dub_uz': 'SnpaiUz Dub (Uzbek)',
+    'player.dub_uz': 'AniSenpaiUz Dub (Uzbek)',
     'player.dub_jp': 'Original Japanese',
 
     // Filter & Catalog
@@ -468,11 +468,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'comments.no_comments': 'No comments yet. Be the first to start the discussion!',
 
     // VIP & Payment
-    'vip.title': 'SnpaiUz Premium VIP',
+    'vip.title': 'AniSenpaiUz Premium VIP',
     'vip.subtitle': 'Enjoy unlimited Full HD 1080p anime streaming without ads!',
     'vip.feature1': 'Ad-free ultra fast streaming',
     'vip.feature2': 'Full HD 1080p & 4K quality',
-    'vip.feature3': 'Exclusive SnpaiUz Uzbek Dubbing',
+    'vip.feature3': 'Exclusive AniSenpaiUz Uzbek Dubbing',
     'vip.feature4': 'Early access to newly released episodes',
     'vip.feature5': 'Offline download support',
     'vip.plan_monthly': '1 Month VIP',
@@ -627,7 +627,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Terms of Service',
     'footer.contact': 'Contact Us',
     'footer.faq': 'FAQ',
-    'footer.rights': 'All rights reserved. SnpaiUz Anime Platform.'
+    'footer.rights': 'All rights reserved. AniSenpaiUz Anime Platform.'
   },
   ru: {
     // Navigation & Header
@@ -635,7 +635,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.catalog': 'Каталог',
     'nav.top': 'Топ Аниме',
     'nav.schedule': 'Расписание',
-    'nav.vip': 'SnpaiUz VIP',
+    'nav.vip': 'AniSenpaiUz VIP',
     'nav.admin': 'Админ панель',
     'nav.categories': 'Категории',
     'nav.favorites': 'Избранное',
@@ -656,7 +656,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'auth.password': 'Пароль',
     'auth.forgot_password': 'Забыли пароль?',
     'auth.email_verification': 'Код подтверждения',
-    'auth.welcome_back': 'С возвращением в SnpaiUz!',
+    'auth.welcome_back': 'С возвращением в AniSenpaiUz!',
     'auth.create_account': 'Создать аккаунт',
     'auth.login_required': 'Пожалуйста, войдите в аккаунт',
     'auth.back_home': 'На главную',
@@ -665,7 +665,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'hero.watch_now': 'Смотреть сейчас',
     'hero.add_watchlist': 'В избранное',
     'hero.in_watchlist': 'В избранном',
-    'hero.top_pick': 'Выбор SnpaiUz',
+    'hero.top_pick': 'Выбор AniSenpaiUz',
     'home.continue_watching': 'Продолжить просмотр',
     'home.trending': '🔥 В тренде',
     'home.popular': '⭐ Самые популярные',
@@ -687,7 +687,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'anime.trailer': 'Трейлер',
     'anime.screenshots': 'Скриншоты',
     'anime.related': 'Похожие аниме',
-    'anime.recommended': 'Рекомендовано SnpaiUz',
+    'anime.recommended': 'Рекомендовано AniSenpaiUz',
     'anime.rate_this': 'Оценить',
     'anime.views': 'просмотров',
     'anime.votes': 'голосов',
@@ -712,7 +712,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'player.sub_uz': 'Узбекские Сабы',
     'player.sub_en': 'Английские Сабы',
     'player.sub_ru': 'Русские Сабы',
-    'player.dub_uz': 'SnpaiUz Даб (Узбекский)',
+    'player.dub_uz': 'AniSenpaiUz Даб (Узбекский)',
     'player.dub_jp': 'Оригинал (Японский)',
 
     // Filter & Catalog
@@ -782,11 +782,11 @@ export const translations: Record<Language, Record<string, string>> = {
     'comments.no_comments': 'Пока нет комментариев. Будьте первыми!',
 
     // VIP & Payment
-    'vip.title': 'SnpaiUz Premium VIP',
+    'vip.title': 'AniSenpaiUz Premium VIP',
     'vip.subtitle': 'Смотрите аниме в 1080p Full HD без рекламы и задержек!',
     'vip.feature1': 'Стриминг без рекламы',
     'vip.feature2': 'Качество Full HD 1080p и 4K',
-    'vip.feature3': 'Эксклюзивный дубляж SnpaiUz',
+    'vip.feature3': 'Эксклюзивный дубляж AniSenpaiUz',
     'vip.feature4': 'Ранний доступ к новым сериям',
     'vip.feature5': 'Возможность скачивания',
     'vip.plan_monthly': '1 Месяц VIP',
@@ -941,6 +941,6 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.terms': 'Условия использования',
     'footer.contact': 'Контакты',
     'footer.faq': 'Часто задаваемые вопросы',
-    'footer.rights': 'Все права защищены. SnpaiUz Anime Platform.'
+    'footer.rights': 'Все права защищены. AniSenpaiUz Anime Platform.'
   }
 };

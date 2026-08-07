@@ -277,7 +277,7 @@ export const AdminPage: React.FC = () => {
   };
 
   // Access Guard
-  if (!user || (user.role !== 'admin' && user.role !== 'super_admin')) {
+  if (!user || (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'premium_admin')) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 space-y-4">
         <SeoHead title="Ruxsat Cheklangan" />
@@ -294,7 +294,7 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <SeoHead title="SenpaiUz Admin Control Panel" />
+      <SeoHead title="AniSenpaiUz Admin Control Panel" />
 
       {/* Admin Title Bar */}
       <div className="bg-slate-900/80 rounded-3xl border border-cyan-500/30 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
@@ -304,7 +304,7 @@ export const AdminPage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-black text-white">{t('admin.title')}</h1>
-            <p className="text-xs text-slate-400">SenpaiUz kontent, foydalanuvchilar va balanslarni boshqarish paneli</p>
+            <p className="text-xs text-slate-400">AniSenpaiUz kontent, foydalanuvchilar va balanslarni boshqarish paneli</p>
           </div>
         </div>
 
