@@ -3,7 +3,7 @@ import {
   Shield, Film, Tv, Users, MessageSquare, Sparkles, Database, 
   Plus, Trash2, Edit, Check, AlertTriangle, Eye, DollarSign, Crown, RefreshCw, Wallet, Grid, Sliders,
   Activity, Server, Cpu, UserCheck, UserPlus, BarChart3, TrendingUp, Clock, Heart, Award,
-  Send, Instagram, Youtube, Share2, BookOpen, Coins, Globe
+  Send, Instagram, Youtube, Share2, BookOpen, Coins, Globe, X
 } from 'lucide-react';
 import { useAnime } from '../context/AnimeContext';
 import { useManga } from '../context/MangaContext';
@@ -23,10 +23,11 @@ export const AdminPage: React.FC = () => {
     supporters, addSupporter, updateSupporter, deleteSupporter
   } = useAnime();
   const {
-    mangas, coinPackages, pricePerCoin, updatePricePerCoin, addManga, deleteManga, addChapter, updateCoinPackagePrice
+    mangas, coinPackages, pricePerCoin, updatePricePerCoin, addManga, updateManga, deleteManga, addChapter, updateCoinPackagePrice
   } = useManga();
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'anime' | 'manga' | 'categories' | 'episodes' | 'users' | 'ai' | 'reports' | 'social' | 'supporters'>('dashboard');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Supporters Form state
   const [suppNickname, setSuppNickname] = useState('');
@@ -40,20 +41,27 @@ export const AdminPage: React.FC = () => {
   const [editingSuppId, setEditingSuppId] = useState<string | null>(null);
   const [adminStats, setAdminStats] = useState<any>(null);
 
-  // New Manga Form state
+  // Manga Form state
   const [mangaTitleUz, setMangaTitleUz] = useState('');
   const [mangaAuthor, setMangaAuthor] = useState('');
   const [mangaGenres, setMangaGenres] = useState('Ekshn, Fentezi');
   const [mangaPoster, setMangaPoster] = useState('');
   const [mangaSynopsisUz, setMangaSynopsisUz] = useState('');
+  const [editingMangaId, setEditingMangaId] = useState<string | null>(null);
 
-  // New Chapter Form state
+  // Chapter Form state
   const [selectedMangaForChapter, setSelectedMangaForChapter] = useState('');
   const [chapterNum, setChapterNum] = useState(1);
   const [chapterTitle, setChapterTitle] = useState('');
   const [chapterIsFree, setChapterIsFree] = useState(true);
   const [chapterCoinPrice, setChapterCoinPrice] = useState(5);
   const [chapterPagesText, setChapterPagesText] = useState('');
+
+  // Categories Local state
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES_LIST);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatEmoji, setNewCatEmoji] = useState('🔥');
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
 
   // Socials & Banner Form state
   const [tgUsername, setTgUsername] = useState(socialSettings?.telegramUsername || '@SenpaiUzz');
@@ -88,8 +96,8 @@ export const AdminPage: React.FC = () => {
 
   useEffect(() => {
     fetch('/api/stats/admin')
-      .then(res => res.json())
-      .then(data => setAdminStats(data))
+      .then(res => res.ok ? res.json() : null)
+      .then(data => data && setAdminStats(data))
       .catch(err => console.error('Failed to load admin stats:', err));
   }, []);
 
@@ -98,7 +106,8 @@ export const AdminPage: React.FC = () => {
   const [aiResult, setAiResult] = useState<{ uz: string; en: string; ru: string } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
-  // New Anime Form
+  // New & Edit Anime Form State
+  const [editingAnimeId, setEditingAnimeId] = useState<string | null>(null);
   const [newTitleUz, setNewTitleUz] = useState('');
   const [newTitleEn, setNewTitleEn] = useState('');
   const [newTitleJp, setNewTitleJp] = useState('');
@@ -109,6 +118,7 @@ export const AdminPage: React.FC = () => {
   const [newStudio, setNewStudio] = useState('MAPPA');
   const [newYear, setNewYear] = useState(2024);
   const [newGenres, setNewGenres] = useState('Action, Fantasy');
+  const [newStatus, setNewStatus] = useState<'Ongoing' | 'Completed' | 'Upcoming'>('Ongoing');
 
   // New Episode Form
   const [selectedAnimeId, setSelectedAnimeId] = useState(animeList[0]?.id || '');
@@ -125,9 +135,9 @@ export const AdminPage: React.FC = () => {
     fetch('/api/admin/users', {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data.users && Array.isArray(data.users)) {
+        if (data && data.users && Array.isArray(data.users)) {
           setUsersList(data.users);
         }
       })
@@ -135,85 +145,128 @@ export const AdminPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    if (activeTab === 'users') {
+      fetchUsers();
+    }
   }, [activeTab]);
 
-  const [topUpUserId, setTopUpUserId] = useState('');
   const [topUpAmt, setTopUpAmt] = useState(50000);
 
-  const isSuperAdmin = user?.role === 'super_admin';
-  const isAdminOrSuper = user?.role === 'admin' || user?.role === 'super_admin';
+  const isAdminOrSuper = user?.role === 'admin' || user?.role === 'super_admin' || user?.role === 'premium_admin';
 
   if (!user || !isAdminOrSuper) {
     return (
-      <div className="py-20 text-center space-y-4 max-w-md mx-auto bg-slate-900/60 p-8 rounded-3xl border border-red-500/30">
-        <Shield className="w-12 h-12 text-red-500 mx-auto" />
-        <h2 className="text-xl font-bold text-white">Kirish Taqiqlangan!</h2>
-        <p className="text-xs text-slate-400">Ushbu sahifa faqat Admin va Super Admin huquqiga ega foydalanuvchilar uchun.</p>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 space-y-4">
+        <SeoHead title="Ruxsat Cheklangan" />
+        <div className="w-16 h-16 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/30">
+          <AlertTriangle className="w-8 h-8" />
+        </div>
+        <h1 className="text-2xl font-black text-white">Ruxsat Cheklangan (403)</h1>
+        <p className="text-slate-400 text-sm max-w-md">
+          Bu sahifa faqat platforma administratorlari va moderatorlari uchun mo'ljallangan. Oddiy foydalanuvchilar admin paneliga kira olmaydi.
+        </p>
       </div>
     );
   }
 
-  // Calculate stats
-  const totalViews = animeList.reduce((acc, a) => acc + a.views, 0);
-  const totalAnime = animeList.length;
-
-  const handleCreateAnime = (e: React.FormEvent) => {
+  const handleCreateOrUpdateAnime = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitleUz || !newPoster) return;
+    if (!newTitleUz || !newPoster || isSubmitting) return;
 
-    const slug = newTitleEn ? newTitleEn.toLowerCase().replace(/\s+/g, '-') : 'anime-' + Date.now();
-    const created: Anime = {
-      id: 'anime-' + Date.now(),
-      slug,
-      title: { uz: newTitleUz, en: newTitleEn || newTitleUz, jp: newTitleJp || newTitleUz },
-      synopsis: { uz: newSynopsisUz || 'Tavsif yo\'q', en: newSynopsisUz, ru: newSynopsisUz },
-      poster: newPoster || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
-      banner: newBanner || newPoster || 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1600&q=80',
-      trailerUrl: newTrailer,
-      screenshots: [newPoster],
-      rating: 0,
-      votesCount: 0,
-      imdbRating: 0,
-      views: 0,
-      popularityScore: 80,
-      year: Number(newYear),
-      status: 'Ongoing',
-      type: 'TV',
-      genres: newGenres.split(',').map(g => g.trim()),
-      country: 'Japan',
-      studio: newStudio,
-      episodesCount: 1,
-      hasSub: true,
-      hasDubUZ: true,
-      hasDubRU: true,
-      episodes: [
-        {
-          id: 'ep-1-' + Date.now(),
-          number: 1,
-          title: { uz: '1-qism', en: 'Episode 1', ru: '1 серия' },
-          duration: '24:00',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-          hasDubUZ: true,
-          hasDubRU: true,
-          airDate: new Date().toISOString().split('T')[0],
-          views: 10
-        }
-      ]
-    };
+    setIsSubmitting(true);
+    const slug = newTitleEn ? newTitleEn.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-0-]/g, '') : 'anime-' + Date.now();
 
-    addAnime(created);
+    if (editingAnimeId) {
+      const existingAnime = animeList.find(a => a.id === editingAnimeId);
+      if (existingAnime) {
+        const updated: Anime = {
+          ...existingAnime,
+          title: { uz: newTitleUz, en: newTitleEn || newTitleUz, jp: newTitleJp || newTitleUz },
+          synopsis: { uz: newSynopsisUz || 'Tavsif yo\'q', en: newSynopsisUz, ru: newSynopsisUz },
+          poster: newPoster,
+          banner: newBanner || newPoster,
+          trailerUrl: newTrailer,
+          year: Number(newYear),
+          status: newStatus,
+          studio: newStudio,
+          genres: newGenres.split(',').map(g => g.trim())
+        };
+        updateAnime(updated);
+        alert('Anime muvaffaqiyatli yangilandi!');
+      }
+      setEditingAnimeId(null);
+    } else {
+      const created: Anime = {
+        id: 'anime-' + Date.now(),
+        slug,
+        title: { uz: newTitleUz, en: newTitleEn || newTitleUz, jp: newTitleJp || newTitleUz },
+        synopsis: { uz: newSynopsisUz || 'Tavsif yo\'q', en: newSynopsisUz, ru: newSynopsisUz },
+        poster: newPoster || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+        banner: newBanner || newPoster || 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1600&q=80',
+        trailerUrl: newTrailer,
+        screenshots: [newPoster],
+        rating: 0,
+        votesCount: 0,
+        imdbRating: 0,
+        views: 0,
+        popularityScore: 80,
+        year: Number(newYear),
+        status: newStatus,
+        type: 'TV',
+        genres: newGenres.split(',').map(g => g.trim()),
+        country: 'Japan',
+        studio: newStudio,
+        episodesCount: 0,
+        hasSub: true,
+        hasDubUZ: true,
+        hasDubRU: true,
+        episodes: []
+      };
+
+      addAnime(created);
+      alert('Anime baza parametrlariga muvaffaqiyatli qo\'shildi!');
+    }
+
+    resetAnimeForm();
+    setIsSubmitting(false);
+  };
+
+  const resetAnimeForm = () => {
+    setEditingAnimeId(null);
     setNewTitleUz('');
     setNewTitleEn('');
+    setNewTitleJp('');
     setNewPoster('');
-    alert('Anime baza parametrlariga muvaffaqiyatli qo\'shildi!');
+    setNewBanner('');
+    setNewTrailer('');
+    setNewSynopsisUz('');
+    setNewStudio('MAPPA');
+    setNewYear(2024);
+    setNewGenres('Action, Fantasy');
+    setNewStatus('Ongoing');
+  };
+
+  const handleStartEditAnime = (anime: Anime) => {
+    setEditingAnimeId(anime.id);
+    setNewTitleUz(anime.title.uz || '');
+    setNewTitleEn(anime.title.en || '');
+    setNewTitleJp(anime.title.jp || '');
+    setNewPoster(anime.poster || '');
+    setNewBanner(anime.banner || '');
+    setNewTrailer(anime.trailerUrl || '');
+    setNewSynopsisUz(anime.synopsis.uz || '');
+    setNewStudio(anime.studio || 'MAPPA');
+    setNewYear(anime.year || 2024);
+    setNewGenres(Array.isArray(anime.genres) ? anime.genres.join(', ') : '');
+    setNewStatus(anime.status || 'Ongoing');
   };
 
   const handleAddEpisode = (e: React.FormEvent) => {
     e.preventDefault();
     const targetAnime = animeList.find(a => a.id === selectedAnimeId);
-    if (!targetAnime || !epTitleUz) return;
+    if (!targetAnime || !epTitleUz || isSubmitting) return;
 
+    setIsSubmitting(true);
     const newEp: Episode = {
       id: 'ep-' + Date.now(),
       number: Number(epNumber),
@@ -234,11 +287,29 @@ export const AdminPage: React.FC = () => {
 
     updateAnime(updated);
     setEpTitleUz('');
+    setEpVideoUrl('');
+    setEpNumber(targetAnime.episodes.length + 2);
     alert(`Qism #${epNumber} animega qo'shildi!`);
+    setIsSubmitting(false);
+  };
+
+  const handleDeleteEpisode = (animeId: string, episodeId: string) => {
+    const targetAnime = animeList.find(a => a.id === animeId);
+    if (!targetAnime) return;
+
+    if (window.confirm("Bu qismni o'chirishga ishonchingiz komilmi?")) {
+      const updatedEpisodes = targetAnime.episodes.filter(ep => ep.id !== episodeId);
+      const updatedAnime = {
+        ...targetAnime,
+        episodesCount: updatedEpisodes.length,
+        episodes: updatedEpisodes
+      };
+      updateAnime(updatedAnime);
+    }
   };
 
   const handleUserTopUp = (userId: string) => {
-    setUsersList(usersList.map(u => u.id === userId ? { ...u, balance: u.balance + topUpAmt } : u));
+    setUsersList(usersList.map(u => u.id === userId ? { ...u, balance: (u.balance || 0) + topUpAmt } : u));
     alert(`Foydalanuvchi ${userId} balansiga +${topUpAmt.toLocaleString()} so'm qo'shildi!`);
   };
 
@@ -247,7 +318,7 @@ export const AdminPage: React.FC = () => {
   };
 
   const handleGenerateAISynopsis = async () => {
-    if (!aiPromptTitle.trim()) return;
+    if (!aiPromptTitle.trim() || aiLoading) return;
     setAiLoading(true);
     try {
       const res = await fetch('/api/ai-generate-synopsis', {
@@ -256,7 +327,7 @@ export const AdminPage: React.FC = () => {
         body: JSON.stringify({ animeTitle: aiPromptTitle })
       });
       const data = await res.json();
-      if (data.synopsis) {
+      if (data && data.synopsis) {
         setAiResult(data.synopsis);
       } else {
         setAiResult({
@@ -276,21 +347,63 @@ export const AdminPage: React.FC = () => {
     }
   };
 
-  // Access Guard
-  if (!user || (user.role !== 'admin' && user.role !== 'super_admin' && user.role !== 'premium_admin')) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 space-y-4">
-        <SeoHead title="Ruxsat Cheklangan" />
-        <div className="w-16 h-16 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center border border-red-500/30">
-          <AlertTriangle className="w-8 h-8" />
-        </div>
-        <h1 className="text-2xl font-black text-white">Ruxsat Cheklangan (403)</h1>
-        <p className="text-slate-400 text-sm max-w-md">
-          Bu sahifa faqat platforma administratorlari va moderatorlari uchun mo'ljallangan. Oddiy foydalanuvchilar admin paneliga kira olmaydi.
-        </p>
-      </div>
-    );
-  }
+  const handleCreateOrUpdateManga = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mangaTitleUz.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
+    if (editingMangaId) {
+      const existingManga = mangas.find(m => m.id === editingMangaId);
+      if (existingManga) {
+        updateManga({
+          ...existingManga,
+          title: { uz: mangaTitleUz, en: mangaTitleUz, jp: mangaTitleUz },
+          author: mangaAuthor || 'Noma\'lum',
+          genres: mangaGenres.split(',').map(s => s.trim()),
+          poster: mangaPoster || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+          synopsis: { uz: mangaSynopsisUz, en: '', ru: '' }
+        });
+        alert("Manga muvaffaqiyatli yangilandi!");
+      }
+      setEditingMangaId(null);
+    } else {
+      addManga({
+        title: { uz: mangaTitleUz, en: mangaTitleUz, jp: mangaTitleUz },
+        author: mangaAuthor || 'Noma\'lum',
+        genres: mangaGenres.split(',').map(s => s.trim()),
+        poster: mangaPoster || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
+        synopsis: { uz: mangaSynopsisUz, en: '', ru: '' }
+      });
+      alert("Yangi manga muvaffaqiyatli qo'shildi!");
+    }
+
+    setMangaTitleUz('');
+    setMangaAuthor('');
+    setMangaPoster('');
+    setMangaSynopsisUz('');
+    setIsSubmitting(false);
+  };
+
+  const handleCategoryAddOrUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCatName.trim()) return;
+
+    if (editingCatId) {
+      setCategoriesList(categoriesList.map(c => c.id === editingCatId ? { ...c, nameUz: newCatName, iconEmoji: newCatEmoji } : c));
+      setEditingCatId(null);
+    } else {
+      const newCat = {
+        id: 'cat-' + Date.now(),
+        nameUz: newCatName,
+        iconEmoji: newCatEmoji,
+        slug: newCatName.toLowerCase().replace(/\s+/g, '-')
+      };
+      setCategoriesList([...categoriesList, newCat as any]);
+    }
+
+    setNewCatName('');
+    setNewCatEmoji('🔥');
+  };
 
   return (
     <div className="space-y-8">
@@ -303,7 +416,7 @@ export const AdminPage: React.FC = () => {
             <Shield className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-white">{t('admin.title')}</h1>
+            <h1 className="text-2xl font-black text-white">{t('admin.title') || 'Admin Panel'}</h1>
             <p className="text-xs text-slate-400">AniSenpaiUz kontent, foydalanuvchilar va balanslarni boshqarish paneli</p>
           </div>
         </div>
@@ -353,7 +466,7 @@ export const AdminPage: React.FC = () => {
           }`}
         >
           <Grid className="w-4 h-4 text-cyan-400" />
-          <span>Kategoriyalar</span>
+          <span>Kategoriyalar ({categoriesList.length})</span>
         </button>
 
         <button
@@ -417,7 +530,7 @@ export const AdminPage: React.FC = () => {
                 <span>Jami Foydalanuvchilar</span>
                 <Users className="w-4 h-4 text-purple-400" />
               </div>
-              <p className="text-3xl font-black text-white">{adminStats?.totalUsers || animeList.length}</p>
+              <p className="text-3xl font-black text-white">{adminStats?.totalUsers || usersList.length || 0}</p>
               <span className="text-[11px] text-emerald-400 font-medium">+{adminStats?.newUsersToday || 0} bugun qo'shildi</span>
             </div>
 
@@ -444,7 +557,7 @@ export const AdminPage: React.FC = () => {
                 <span>Jami Ko'rishlar</span>
                 <Eye className="w-4 h-4 text-amber-400" />
               </div>
-              <p className="text-3xl font-black text-amber-300">{(adminStats?.totalViews ?? 0).toLocaleString()}</p>
+              <p className="text-3xl font-black text-amber-300">{(adminStats?.totalViews ?? animeList.reduce((acc, a) => acc + (a.views || 0), 0)).toLocaleString()}</p>
               <span className="text-[11px] text-amber-400 font-medium">+{adminStats?.todayViews || 0} bugungi ko'rishlar</span>
             </div>
           </div>
@@ -471,7 +584,7 @@ export const AdminPage: React.FC = () => {
               </div>
               <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-1">
                 <span className="text-slate-400 font-medium block">Jami Ko'rishlar Logs</span>
-                <p className="text-xl font-black text-emerald-400">{(adminStats?.totalViews || 0).toLocaleString()}</p>
+                <p className="text-xl font-black text-emerald-400">{(adminStats?.totalViews || animeList.reduce((a, b) => a + (b.views || 0), 0)).toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -488,7 +601,7 @@ export const AdminPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                {[...animeList].sort((a, b) => b.views - a.views).slice(0, 10).map((anime, idx) => (
+                {[...animeList].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 10).map((anime, idx) => (
                   <div key={anime.id} className="flex items-center justify-between p-2.5 bg-slate-950/70 rounded-xl border border-slate-800/80 text-xs">
                     <div className="flex items-center gap-3">
                       <span className="w-5 h-5 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold text-[10px] flex items-center justify-center">
@@ -497,12 +610,12 @@ export const AdminPage: React.FC = () => {
                       <img src={anime.poster} alt={anime.title.uz} className="w-8 h-10 object-cover rounded-md" />
                       <div>
                         <p className="font-bold text-white text-xs">{anime.title.uz || anime.title.en}</p>
-                        <span className="text-[11px] text-slate-400">⭐ {anime.rating} / 10</span>
+                        <span className="text-[11px] text-slate-400">⭐ {anime.rating || 0} / 10</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-emerald-400 text-xs">{anime.views.toLocaleString()} views</p>
-                      <span className="text-[10px] text-slate-500">{anime.episodes.length} qism</span>
+                      <p className="font-bold text-emerald-400 text-xs">{(anime.views || 0).toLocaleString()} views</p>
+                      <span className="text-[10px] text-slate-500">{anime.episodes ? anime.episodes.length : 0} qism</span>
                     </div>
                   </div>
                 ))}
@@ -519,7 +632,7 @@ export const AdminPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                {(adminStats?.topActiveUsers || []).map((u: any, idx: number) => (
+                {(adminStats?.topActiveUsers || usersList.slice(0, 5)).map((u: any, idx: number) => (
                   <div key={u.id} className="flex items-center justify-between p-3 bg-slate-950/70 rounded-xl border border-slate-800/80 text-xs">
                     <div className="flex items-center gap-3">
                       <span className="w-5 h-5 rounded-full bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 font-bold text-[10px] flex items-center justify-center">
@@ -527,15 +640,15 @@ export const AdminPage: React.FC = () => {
                       </span>
                       <div>
                         <p className="font-bold text-white text-xs flex items-center gap-1.5">
-                          {u.name}
+                          {u.name || 'User'}
                           {u.role === 'super_admin' && <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">SUPER ADMIN</span>}
                         </p>
-                        <p className="text-[10px] text-slate-400">{u.email}</p>
+                        <p className="text-[10px] text-slate-400">{u.email || 'no-email'}</p>
                       </div>
                     </div>
                     <div className="text-right space-y-0.5">
-                      <p className="font-bold text-cyan-400 text-xs">{u.watchedEpisodes} qism ko'rilgan</p>
-                      <span className="text-[10px] text-pink-400 font-medium block">{u.favoritesCount} sevimli</span>
+                      <p className="font-bold text-cyan-400 text-xs">{u.watchedEpisodes || 0} qism ko'rilgan</p>
+                      <span className="text-[10px] text-pink-400 font-medium block">{u.favoritesCount || 0} sevimli</span>
                     </div>
                   </div>
                 ))}
@@ -599,12 +712,23 @@ export const AdminPage: React.FC = () => {
       {/* TAB 2: ANIME MANAGEMENT */}
       {activeTab === 'anime' && (
         <div className="space-y-8">
-          {/* Add Anime Form */}
-          <form onSubmit={handleCreateAnime} className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-purple-400" />
-              Yangi Anime Yaratish (CRUD)
-            </h3>
+          {/* Add / Edit Anime Form */}
+          <form onSubmit={handleCreateOrUpdateAnime} className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-400" />
+                {editingAnimeId ? "Animeni Tahrirlash" : "Yangi Anime Yaratish (CRUD)"}
+              </h3>
+              {editingAnimeId && (
+                <button
+                  type="button"
+                  onClick={resetAnimeForm}
+                  className="px-3 py-1 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+                >
+                  Bekor qilish
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
@@ -656,6 +780,39 @@ export const AdminPage: React.FC = () => {
               />
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <input
+                type="text"
+                placeholder="Studiya (masalan: MAPPA)"
+                value={newStudio}
+                onChange={(e) => setNewStudio(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              />
+              <input
+                type="number"
+                placeholder="Yil (masalan: 2024)"
+                value={newYear}
+                onChange={(e) => setNewYear(Number(e.target.value))}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              />
+              <input
+                type="text"
+                placeholder="Janrlar (vergul bilan)"
+                value={newGenres}
+                onChange={(e) => setNewGenres(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              />
+              <select
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value as any)}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-bold"
+              >
+                <option value="Ongoing">Ongoing</option>
+                <option value="Completed">Completed</option>
+                <option value="Upcoming">Upcoming</option>
+              </select>
+            </div>
+
             <textarea
               placeholder="Synopsis / Mazmuni (Uzbek)"
               rows={2}
@@ -666,22 +823,23 @@ export const AdminPage: React.FC = () => {
 
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30"
+              disabled={isSubmitting}
+              className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 disabled:opacity-50"
             >
-              Bazaga Qo'shish
+              {editingAnimeId ? "Saqlash va Yangilash" : "Bazaga Qo'shish"}
             </button>
           </form>
 
           {/* Anime List Table */}
-          <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-hidden">
-            <table className="w-full text-left text-xs text-slate-300">
+          <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-300 min-w-[600px]">
               <thead className="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
                 <tr>
                   <th className="p-4">Poster</th>
                   <th className="p-4">Nomi</th>
                   <th className="p-4">Studiya</th>
                   <th className="p-4">Qismlar</th>
-                  <th className="p-4">Amallar</th>
+                  <th className="p-4 text-right">Amallar</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -691,11 +849,22 @@ export const AdminPage: React.FC = () => {
                       <img src={a.poster} alt={a.title.uz} className="w-10 h-14 object-cover rounded-lg" />
                     </td>
                     <td className="p-4 font-bold text-white">{a.title.uz}</td>
-                    <td className="p-4">{a.studio} ({a.year})</td>
-                    <td className="p-4 text-purple-300 font-bold">{a.episodesCount} qism</td>
-                    <td className="p-4">
+                    <td className="p-4">{a.studio || 'MAPPA'} ({a.year || 2024})</td>
+                    <td className="p-4 text-purple-300 font-bold">{a.episodes ? a.episodes.length : 0} qism</td>
+                    <td className="p-4 text-right space-x-2">
                       <button
-                        onClick={() => deleteAnime(a.id)}
+                        onClick={() => handleStartEditAnime(a)}
+                        className="p-2 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                        title="Tahrirlash"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`"${a.title.uz}" animeni o'chirmoqchimisiz?`)) {
+                            deleteAnime(a.id);
+                          }
+                        }}
                         className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
                         title="O'chirish"
                       >
@@ -714,30 +883,32 @@ export const AdminPage: React.FC = () => {
       {activeTab === 'manga' && (
         <div className="space-y-8">
           
-          {/* Add Manga Form */}
+          {/* Add / Edit Manga Form */}
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!mangaTitleUz.trim()) return;
-              addManga({
-                title: { uz: mangaTitleUz, en: mangaTitleUz, jp: mangaTitleUz },
-                author: mangaAuthor || 'Noma\'lum',
-                genres: mangaGenres.split(',').map(s => s.trim()),
-                poster: mangaPoster || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
-                synopsis: { uz: mangaSynopsisUz, en: '', ru: '' }
-              });
-              setMangaTitleUz('');
-              setMangaAuthor('');
-              setMangaPoster('');
-              setMangaSynopsisUz('');
-              alert("Yangi manga muvaffaqiyatli qo'shildi!");
-            }}
+            onSubmit={handleCreateOrUpdateManga}
             className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4"
           >
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Plus className="w-5 h-5 text-purple-400" />
-              Yangi Manga / Manhwa Qo'shish
-            </h3>
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Plus className="w-5 h-5 text-purple-400" />
+                {editingMangaId ? "Manga Tahrirlash" : "Yangi Manga / Manhwa Qo'shish"}
+              </h3>
+              {editingMangaId && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingMangaId(null);
+                    setMangaTitleUz('');
+                    setMangaAuthor('');
+                    setMangaPoster('');
+                    setMangaSynopsisUz('');
+                  }}
+                  className="px-3 py-1 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700"
+                >
+                  Bekor qilish
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
@@ -782,9 +953,10 @@ export const AdminPage: React.FC = () => {
 
             <button
               type="submit"
-              className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30"
+              disabled={isSubmitting}
+              className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 disabled:opacity-50"
             >
-              Manga Saqlash
+              {editingMangaId ? "Saqlash" : "Manga Saqlash"}
             </button>
           </form>
 
@@ -941,7 +1113,7 @@ export const AdminPage: React.FC = () => {
                   </div>
 
                   <p className="text-[10px] text-slate-500 font-mono text-right">
-                    ~{(pkg.priceUZS / pkg.coins).toFixed(1)} so'm / coin
+                    ~{(pkg.priceUZS / (pkg.coins || 1)).toFixed(1)} so'm / coin
                   </p>
                 </div>
               ))}
@@ -949,15 +1121,15 @@ export const AdminPage: React.FC = () => {
           </div>
 
           {/* Manga List Table */}
-          <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-hidden">
-            <table className="w-full text-left text-xs text-slate-300">
+          <div className="bg-slate-900/80 rounded-3xl border border-slate-800 overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-300 min-w-[600px]">
               <thead className="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
                 <tr>
                   <th className="p-4">Poster</th>
                   <th className="p-4">Manga Nomi</th>
                   <th className="p-4">Muallif</th>
                   <th className="p-4">Boblar Soni</th>
-                  <th className="p-4">Amallar</th>
+                  <th className="p-4 text-right">Amallar</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -968,10 +1140,28 @@ export const AdminPage: React.FC = () => {
                     </td>
                     <td className="p-4 font-bold text-white">{m.title.uz}</td>
                     <td className="p-4">{m.author}</td>
-                    <td className="p-4 text-purple-300 font-bold">{m.chapters.length} bob</td>
-                    <td className="p-4">
+                    <td className="p-4 text-purple-300 font-bold">{m.chapters ? m.chapters.length : 0} bob</td>
+                    <td className="p-4 text-right space-x-2">
                       <button
-                        onClick={() => deleteManga(m.id)}
+                        onClick={() => {
+                          setEditingMangaId(m.id);
+                          setMangaTitleUz(m.title.uz || '');
+                          setMangaAuthor(m.author || '');
+                          setMangaGenres(Array.isArray(m.genres) ? m.genres.join(', ') : '');
+                          setMangaPoster(m.poster || '');
+                          setMangaSynopsisUz(m.synopsis?.uz || '');
+                        }}
+                        className="p-2 rounded-lg bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                        title="Tahrirlash"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`"${m.title.uz}" mangani o'chirmoqchimisiz?`)) {
+                            deleteManga(m.id);
+                          }
+                        }}
                         className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
                         title="O'chirish"
                       >
@@ -989,73 +1179,155 @@ export const AdminPage: React.FC = () => {
 
       {/* TAB 3: CATEGORIES */}
       {activeTab === 'categories' && (
-        <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
-          <h3 className="font-bold text-white text-base flex items-center gap-2">
-            <Grid className="w-5 h-5 text-cyan-400" />
-            <span>Kategoriyalar Ro'yxati</span>
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {CATEGORIES_LIST.map(c => (
-              <div key={c.id} className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
-                <span className="text-xs font-bold text-white">{c.iconEmoji || c.icon} {c.nameUz}</span>
-                <span className="text-[10px] text-purple-400 font-mono">ID: {c.id}</span>
-              </div>
-            ))}
+        <div className="space-y-6">
+          <form onSubmit={handleCategoryAddOrUpdate} className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 className="font-bold text-white text-base flex items-center gap-2">
+              <Grid className="w-5 h-5 text-cyan-400" />
+              <span>{editingCatId ? "Kategoriyani Tahrirlash" : "Yangi Kategoriya Qo'shish"}</span>
+            </h3>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                placeholder="Emoji (masalan: 🔥)"
+                value={newCatEmoji}
+                onChange={(e) => setNewCatEmoji(e.target.value)}
+                className="w-24 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white text-center font-bold"
+              />
+              <input
+                type="text"
+                placeholder="Kategoriya nomi (O'zbekcha)"
+                required
+                value={newCatName}
+                onChange={(e) => setNewCatName(e.target.value)}
+                className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-bold"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-cyan-600/30"
+              >
+                {editingCatId ? "Saqlash" : "Qo'shish"}
+              </button>
+            </div>
+          </form>
+
+          <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 className="font-bold text-white text-base">Mavjud Kategoriyalar Ro'yxati</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              {categoriesList.map(c => (
+                <div key={c.id} className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
+                  <span className="text-xs font-bold text-white">{c.iconEmoji || c.icon} {c.nameUz}</span>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => {
+                        setEditingCatId(c.id);
+                        setNewCatName(c.nameUz);
+                        setNewCatEmoji(c.iconEmoji || '🔥');
+                      }}
+                      className="p-1 rounded bg-slate-800 text-amber-400 hover:bg-slate-700"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setCategoriesList(categoriesList.filter(item => item.id !== c.id));
+                      }}
+                      className="p-1 rounded bg-slate-800 text-red-400 hover:bg-slate-700"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       {/* TAB 4: EPISODES */}
       {activeTab === 'episodes' && (
-        <form onSubmit={handleAddEpisode} className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4 max-w-xl">
-          <h3 className="font-bold text-white text-base">Animega Yangi Qism Qo'shish</h3>
-          <div>
-            <label className="text-xs text-slate-400 block mb-1">Animeni Tanlang:</label>
-            <select
-              value={selectedAnimeId}
-              onChange={(e) => setSelectedAnimeId(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
-            >
-              {animeList.map(a => (
-                <option key={a.id} value={a.id}>{a.title.uz} ({a.episodes.length} qism)</option>
-              ))}
-            </select>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <form onSubmit={handleAddEpisode} className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 className="font-bold text-white text-base">Animega Yangi Qism Qo'shish</h3>
+            <div>
+              <label className="text-xs text-slate-400 block mb-1">Animeni Tanlang:</label>
+              <select
+                value={selectedAnimeId}
+                onChange={(e) => setSelectedAnimeId(e.target.value)}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white font-bold"
+              >
+                {animeList.map(a => (
+                  <option key={a.id} value={a.id}>{a.title.uz} ({a.episodes ? a.episodes.length : 0} qism)</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              type="number"
-              placeholder="Qism raqami (Masalan: 12)"
-              required
-              value={epNumber}
-              onChange={(e) => setEpNumber(Number(e.target.value))}
-              className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
-            />
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                type="number"
+                placeholder="Qism raqami (Masalan: 12)"
+                required
+                value={epNumber}
+                onChange={(e) => setEpNumber(Number(e.target.value))}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              />
+              <input
+                type="text"
+                placeholder="Qism nomi"
+                required
+                value={epTitleUz}
+                onChange={(e) => setEpTitleUz(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              />
+            </div>
+
             <input
               type="text"
-              placeholder="Qism nomi"
-              required
-              value={epTitleUz}
-              onChange={(e) => setEpTitleUz(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+              placeholder="Video Stream URL (.mp4 / embed link)"
+              value={epVideoUrl}
+              onChange={(e) => setEpVideoUrl(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
             />
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs disabled:opacity-50"
+            >
+              Qismni Yuklash
+            </button>
+          </form>
+
+          {/* Current Anime Episodes Overview */}
+          <div className="bg-slate-900/80 p-6 rounded-3xl border border-slate-800 space-y-4">
+            <h3 className="font-bold text-white text-base">Tanlangan Anime Qismlari</h3>
+            {(() => {
+              const currentAnime = animeList.find(a => a.id === selectedAnimeId);
+              if (!currentAnime || !currentAnime.episodes || currentAnime.episodes.length === 0) {
+                return <p className="text-xs text-slate-500">Ushbu animeda hali qismlar mavjud emas.</p>;
+              }
+              return (
+                <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                  {currentAnime.episodes.map(ep => (
+                    <div key={ep.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-white">#{ep.number} - {ep.title.uz}</p>
+                        <span className="text-[10px] text-slate-400">{ep.airDate || 'Sana ko\'rsatilmagan'}</span>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteEpisode(currentAnime.id, ep.id)}
+                        className="p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                        title="O'chirish"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
-
-          <input
-            type="text"
-            placeholder="Video Stream URL (.mp4 / embed link)"
-            value={epVideoUrl}
-            onChange={(e) => setEpVideoUrl(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
-          />
-
-          <button
-            type="submit"
-            className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs"
-          >
-            Qismni Yuklash
-          </button>
-        </form>
+        </div>
       )}
 
       {/* TAB 5: USERS & BALANCES */}
@@ -1067,13 +1339,13 @@ export const AdminPage: React.FC = () => {
           </h3>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
+            <table className="w-full text-left text-xs text-slate-300 min-w-[700px]">
               <thead className="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
                 <tr>
                   <th className="p-3">User ID</th>
                   <th className="p-3">Ismi</th>
                   <th className="p-3">Email / Telefon</th>
-                  <th className="p-3">VIP</th>
+                  <th className="p-3">VIP Status</th>
                   <th className="p-3">Balans</th>
                   <th className="p-3">Balans Qo'shish</th>
                 </tr>
@@ -1082,8 +1354,8 @@ export const AdminPage: React.FC = () => {
                 {usersList.map((u) => (
                   <tr key={u.id} className="hover:bg-slate-950/40">
                     <td className="p-3 font-mono text-purple-300 font-bold">{u.id}</td>
-                    <td className="p-3 font-bold text-white">{u.name}</td>
-                    <td className="p-3 text-slate-400">{u.email} <br/> <span className="text-[10px] text-slate-500">{u.phone}</span></td>
+                    <td className="p-3 font-bold text-white">{u.name || 'Foydalanuvchi'}</td>
+                    <td className="p-3 text-slate-400">{u.email || '-'} <br/> <span className="text-[10px] text-slate-500">{u.phone || ''}</span></td>
                     <td className="p-3">
                       <button
                         onClick={() => handleToggleVip(u.id)}
@@ -1094,7 +1366,7 @@ export const AdminPage: React.FC = () => {
                         {u.isVip ? 'VIP FAOL' : 'ODDIY'}
                       </button>
                     </td>
-                    <td className="p-3 font-mono text-emerald-400 font-bold">{u.balance.toLocaleString()} UZS</td>
+                    <td className="p-3 font-mono text-emerald-400 font-bold">{(u.balance || 0).toLocaleString()} UZS</td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
                         <button
@@ -1132,7 +1404,7 @@ export const AdminPage: React.FC = () => {
             <button
               onClick={handleGenerateAISynopsis}
               disabled={aiLoading}
-              className="px-5 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs"
+              className="px-5 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs disabled:opacity-50"
             >
               {aiLoading ? 'Yaratilmoqda...' : 'Avto Yaratish'}
             </button>
@@ -1144,6 +1416,8 @@ export const AdminPage: React.FC = () => {
               <p className="text-slate-300">{aiResult.uz}</p>
               <p className="font-bold text-purple-300">English:</p>
               <p className="text-slate-300">{aiResult.en}</p>
+              <p className="font-bold text-emerald-300">Русский:</p>
+              <p className="text-slate-300">{aiResult.ru}</p>
             </div>
           )}
         </div>
@@ -1371,7 +1645,7 @@ export const AdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 10: SUPPORTERS MANAGEMENT */}
+      {/* TAB 8: SUPPORTERS MANAGEMENT */}
       {activeTab === 'supporters' && (
         <div className="space-y-8">
           {/* Add / Edit Supporter Form */}
@@ -1573,7 +1847,7 @@ export const AdminPage: React.FC = () => {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-slate-300">
+              <table className="w-full text-left text-xs text-slate-300 min-w-[650px]">
                 <thead className="bg-slate-950 text-slate-400 font-bold uppercase border-b border-slate-800">
                   <tr>
                     <th className="p-3">Avatar</th>
@@ -1599,7 +1873,7 @@ export const AdminPage: React.FC = () => {
                           <img
                             src={s.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'}
                             alt={s.nickname}
-                            className="w-10 h-10 rounded-full object-cover ring-1 ring-purple-500/50 shadow"
+                            className="w-10 h-10 rounded-full object-cover ring-1 ring-purple-500/50 shadow aspect-square"
                           />
                         </td>
                         <td className="p-3 font-extrabold text-white">{s.nickname}</td>
@@ -1645,7 +1919,7 @@ export const AdminPage: React.FC = () => {
                           </button>
                           <button
                             onClick={() => {
-                              if (confirm(`Haqiqatan ham "${s.nickname}" nomli homiyni o'chirmoqchimisiz?`)) {
+                              if (window.confirm(`Haqiqatan ham "${s.nickname}" nomli homiyni o'chirmoqchimisiz?`)) {
                                 deleteSupporter(s.id);
                               }
                             }}
@@ -1667,3 +1941,4 @@ export const AdminPage: React.FC = () => {
     </div>
   );
 };
+
