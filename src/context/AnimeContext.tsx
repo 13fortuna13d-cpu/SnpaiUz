@@ -105,12 +105,20 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const saved = localStorage.getItem('snpaiuz_anime_catalog_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: Anime) => ({
+            ...item,
+            episodes: Array.isArray(item.episodes) ? item.episodes : []
+          }));
+        }
       }
     } catch (e) {
       console.error('Failed to parse anime list from localStorage:', e);
     }
-    return INITIAL_ANIME_DATA;
+    return INITIAL_ANIME_DATA.map(item => ({
+      ...item,
+      episodes: Array.isArray(item.episodes) ? item.episodes : []
+    }));
   });
 
   const [comments, setComments] = useState<Record<string, Comment[]>>(() => {
@@ -337,19 +345,38 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const addAnime = useCallback((newAnime: Anime) => {
     if (!newAnime || !newAnime.id) return;
 
+    const sanitizedAnime: Anime = {
+      ...newAnime,
+      episodes: Array.isArray(newAnime.episodes) ? newAnime.episodes : [],
+      rating: typeof newAnime.rating === 'number' ? newAnime.rating : 0,
+      votesCount: typeof newAnime.votesCount === 'number' ? newAnime.votesCount : 0,
+      views: typeof newAnime.views === 'number' ? newAnime.views : 0,
+    };
+
     setAnimeList(prev => {
-      const exists = prev.some(a => a.id === newAnime.id);
+      const exists = prev.some(a => a.id === sanitizedAnime.id);
       if (exists) {
-        return prev.map(a => a.id === newAnime.id ? newAnime : a);
+        return prev.map(a => a.id === sanitizedAnime.id ? { ...a, ...sanitizedAnime } : a);
       }
-      return [newAnime, ...prev];
+      return [sanitizedAnime, ...prev];
     });
   }, []);
 
   const updateAnime = useCallback((updatedAnime: Anime) => {
     if (!updatedAnime || !updatedAnime.id) return;
 
-    setAnimeList(prev => prev.map(a => a.id === updatedAnime.id ? updatedAnime : a));
+    setAnimeList(prev => prev.map(a => {
+      if (a.id === updatedAnime.id) {
+        return {
+          ...a,
+          ...updatedAnime,
+          episodes: Array.isArray(updatedAnime.episodes) 
+            ? updatedAnime.episodes 
+            : (Array.isArray(a.episodes) ? a.episodes : [])
+        };
+      }
+      return a;
+    }));
   }, []);
 
   const deleteAnime = useCallback((animeId: string) => {
@@ -375,7 +402,7 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const currentEpisodes = Array.isArray(anime.episodes) ? anime.episodes : [];
         const episodeExists = currentEpisodes.some(e => e.id === episode.id);
         const updatedEpisodes = episodeExists
-          ? currentEpisodes.map(e => e.id === episode.id ? episode : e)
+          ? currentEpisodes.map(e => e.id === episode.id ? { ...e, ...episode } : e)
           : [...currentEpisodes, episode];
 
         return {
@@ -395,7 +422,7 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const currentEpisodes = Array.isArray(anime.episodes) ? anime.episodes : [];
         return {
           ...anime,
-          episodes: currentEpisodes.map(e => e.id === updatedEpisode.id ? updatedEpisode : e)
+          episodes: currentEpisodes.map(e => e.id === updatedEpisode.id ? { ...e, ...updatedEpisode } : e)
         };
       }
       return anime;
@@ -431,7 +458,6 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       }
     } catch (err) {
-      // Safe catch block to prevent unhandled promise rejections
       console.warn('Unable to fetch platform stats:', err);
     }
   }, []);
@@ -471,18 +497,20 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // Supporter Management
   const addSupporter = useCallback((data: Partial<Supporter>) => {
-    const newSupporter: Supporter = {
-      id: 'supp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
-      nickname: data.nickname || 'Anonim Supporter',
-      avatar: data.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
-      isVip: data.isVip ?? false,
-      amount: data.amount || 10000,
-      dateSupported: data.dateSupported || new Date().toISOString().split('T')[0],
-      visible: data.visible ?? true,
-      displayOrder: data.displayOrder ?? (supporters.length + 1)
-    };
-    setSupporters(prev => [...prev, newSupporter]);
-  }, [supporters.length]);
+    setSupporters(prev => {
+      const newSupporter: Supporter = {
+        id: 'supp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+        nickname: data.nickname || 'Anonim Supporter',
+        avatar: data.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+        isVip: data.isVip ?? false,
+        amount: data.amount || 10000,
+        dateSupported: data.dateSupported || new Date().toISOString().split('T')[0],
+        visible: data.visible ?? true,
+        displayOrder: data.displayOrder ?? (prev.length + 1)
+      };
+      return [...prev, newSupporter];
+    });
+  }, []);
 
   const updateSupporter = useCallback((id: string, updates: Partial<Supporter>) => {
     if (!id) return;
