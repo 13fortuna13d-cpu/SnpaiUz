@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Anime, Comment, AdConfig, Report, SocialSettings, Supporter } from '../types';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { Anime, Episode, Comment, AdConfig, Report, SocialSettings, Supporter } from '../types';
 import { INITIAL_ANIME_DATA } from '../data/mockAnimeData';
 import { INITIAL_SUPPORTERS } from '../data/mockSupportersData';
 
@@ -40,6 +40,10 @@ interface AnimeContextType {
   addAnime: (anime: Anime) => void;
   updateAnime: (anime: Anime) => void;
   deleteAnime: (animeId: string) => void;
+  // Episode CRUD
+  addEpisode: (animeId: string, episode: Episode) => void;
+  updateEpisode: (animeId: string, episode: Episode) => void;
+  deleteEpisode: (animeId: string, episodeId: string) => void;
   ads: AdConfig[];
   reports: Report[];
   resolveReport: (reportId: string) => void;
@@ -66,8 +70,8 @@ const DEFAULT_SOCIAL_SETTINGS: SocialSettings = {
   facebookUrl: 'https://facebook.com/anisenpaiuz',
   youtubeUrl: 'https://youtube.com/@anisenpaiuz',
   websiteUrl: 'https://anisenpaiuz.com',
-  telegramBannerTitle: 'AniSenpaiUz Telegram Kanaliga A\'zo Bo\'ling!',
-  telegramBannerDesc: 'Eng so\'nggi va yangi anime qismlari, premyeralar va yangiliklardan birinchilardan bo\'lib xabardor bo\'ling!',
+  telegramBannerTitle: "AniSenpaiUz Telegram Kanaliga A'zo Bo'ling!",
+  telegramBannerDesc: "Eng so'nggi va yangi anime qismlari, premyeralar va yangiliklardan birinchilardan bo'lib xabardor bo'ling!",
   showTelegramBanner: true
 };
 
@@ -77,7 +81,7 @@ const DEFAULT_ADS: AdConfig[] = [
   {
     id: 'ad-1',
     type: 'banner',
-    title: 'AniSenpaiUz Telegram Kanaliga A\'zo Bo\'ling!',
+    title: "AniSenpaiUz Telegram Kanaliga A'zo Bo'ling!",
     targetUrl: 'https://t.me/SenpaiUzz',
     active: true,
     position: 'header'
@@ -87,6 +91,15 @@ const DEFAULT_ADS: AdConfig[] = [
 const AnimeContext = createContext<AnimeContextType | undefined>(undefined);
 
 export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isMountedRef = useRef<boolean>(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const [animeList, setAnimeList] = useState<Anime[]>(() => {
     try {
       const saved = localStorage.getItem('snpaiuz_anime_catalog_v2');
@@ -105,7 +118,7 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const saved = localStorage.getItem('snpaiuz_comments_v2');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') return parsed;
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
       }
     } catch (e) {
       console.error('Failed to parse comments from localStorage:', e);
@@ -121,7 +134,7 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const saved = localStorage.getItem('snpaiuz_social_settings');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed && typeof parsed === 'object') {
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
           return { ...DEFAULT_SOCIAL_SETTINGS, ...parsed };
         }
       }
@@ -131,17 +144,18 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return DEFAULT_SOCIAL_SETTINGS;
   });
 
-  const updateSocialSettings = (newSettings: Partial<SocialSettings>) => {
-    setSocialSettings(prev => {
-      const updated = { ...prev, ...newSettings };
-      try {
-        localStorage.setItem('snpaiuz_social_settings', JSON.stringify(updated));
-      } catch (e) {
-        console.error('Failed to save social settings:', e);
+  const [supporters, setSupporters] = useState<Supporter[]>(() => {
+    try {
+      const saved = localStorage.getItem('senpaiuz_supporters');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
-      return updated;
-    });
-  };
+    } catch (e) {
+      console.error('Failed to parse supporters:', e);
+    }
+    return INITIAL_SUPPORTERS;
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({
@@ -153,6 +167,20 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sortBy: 'popular'
   });
 
+  const [platformStats, setPlatformStats] = useState<PlatformStats>({
+    totalUsers: 1,
+    usersToday: 0,
+    usersLast7Days: 1,
+    totalViews: 0,
+    todayViews: 0,
+    weeklyViews: 0,
+    monthlyViews: 0,
+    totalFavorites: 0,
+    favoritedMap: {},
+    updatedAt: new Date().toISOString()
+  });
+
+  // Safe LocalStorage Persistence
   useEffect(() => {
     try {
       localStorage.setItem('snpaiuz_anime_catalog_v2', JSON.stringify(animeList));
@@ -169,7 +197,27 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [comments]);
 
-  const resetFilters = () => {
+  useEffect(() => {
+    try {
+      localStorage.setItem('senpaiuz_supporters', JSON.stringify(supporters));
+    } catch (e) {
+      console.error('Failed to save supporters:', e);
+    }
+  }, [supporters]);
+
+  const updateSocialSettings = useCallback((newSettings: Partial<SocialSettings>) => {
+    setSocialSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      try {
+        localStorage.setItem('snpaiuz_social_settings', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to save social settings:', e);
+      }
+      return updated;
+    });
+  }, []);
+
+  const resetFilters = useCallback(() => {
     setFilters({
       genre: '',
       year: '',
@@ -179,18 +227,21 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       sortBy: 'popular'
     });
     setSearchQuery('');
-  };
+  }, []);
 
-  const addComment = (animeId: string, content: string, episodeId?: string) => {
+  // Comments Management
+  const addComment = useCallback((animeId: string, content: string, episodeId?: string) => {
+    if (!animeId || !content.trim()) return;
+
     const newComment: Comment = {
-      id: 'c-' + Date.now(),
+      id: 'c-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
       animeId,
       episodeId,
       userId: 'usr-current',
       userName: 'Foydalanuvchi',
       userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=100&q=80',
       userBadge: 'User',
-      content,
+      content: content.trim(),
       createdAt: 'Hozirgina',
       likes: 0,
       dislikes: 0,
@@ -201,9 +252,11 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ...prev,
       [animeId]: [newComment, ...(prev[animeId] || [])]
     }));
-  };
+  }, []);
 
-  const likeComment = (commentId: string, animeId: string) => {
+  const likeComment = useCallback((commentId: string, animeId: string) => {
+    if (!commentId || !animeId) return;
+
     setComments(prev => {
       const list = prev[animeId] || [];
       const updated = list.map(c => {
@@ -212,18 +265,20 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           return {
             ...c,
             userLiked: !liked,
-            likes: liked ? c.likes - 1 : c.likes + 1
+            likes: liked ? Math.max(0, c.likes - 1) : c.likes + 1
           };
         }
         return c;
       });
       return { ...prev, [animeId]: updated };
     });
-  };
+  }, []);
 
-  const reportComment = (commentId: string, animeId: string, reason: string) => {
+  const reportComment = useCallback((commentId: string, animeId: string, reason: string) => {
+    if (!commentId || !reason) return;
+
     const newReport: Report = {
-      id: 'rep-' + Date.now(),
+      id: 'rep-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
       type: 'comment',
       targetId: commentId,
       reason,
@@ -232,117 +287,192 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       status: 'pending'
     };
     setReports(prev => [newReport, ...prev]);
-  };
+  }, []);
 
-  const rateAnime = (animeId: string, stars: number) => {
+  const deleteCommentAdmin = useCallback((commentId: string, animeId: string) => {
+    if (!commentId || !animeId) return;
+
+    setComments(prev => ({
+      ...prev,
+      [animeId]: (prev[animeId] || []).filter(c => c.id !== commentId)
+    }));
+  }, []);
+
+  const resolveReport = useCallback((reportId: string) => {
+    setReports(prev => prev.map(r => r.id === reportId ? { ...r, status: 'resolved' as const } : r));
+  }, []);
+
+  // Anime Rating & Stats
+  const rateAnime = useCallback((animeId: string, stars: number) => {
+    if (!animeId || stars < 1 || stars > 5) return;
+
     setAnimeList(prev => prev.map(a => {
       if (a.id === animeId) {
-        const newVotes = a.votesCount + 1;
-        const newRating = Number(((a.rating * a.votesCount + stars * 2) / newVotes).toFixed(1));
+        const currentVotes = typeof a.votesCount === 'number' ? a.votesCount : 0;
+        const currentRating = typeof a.rating === 'number' ? a.rating : 0;
+        const newVotes = currentVotes + 1;
+        const newRating = Number(((currentRating * currentVotes + stars * 2) / newVotes).toFixed(1));
         return {
           ...a,
-          rating: newRating,
+          rating: Math.min(10, Math.max(0, newRating)),
           votesCount: newVotes
         };
       }
       return a;
     }));
-  };
+  }, []);
 
-  const addAnime = (newAnime: Anime) => {
-    setAnimeList(prev => [newAnime, ...prev]);
-  };
+  const incrementViews = useCallback((animeId: string) => {
+    if (!animeId) return;
 
-  const updateAnime = (updatedAnime: Anime) => {
-    setAnimeList(prev => prev.map(a => a.id === updatedAnime.id ? updatedAnime : a));
-  };
-
-  const deleteAnime = (animeId: string) => {
-    setAnimeList(prev => prev.filter(a => a.id !== animeId));
-  };
-
-  const resolveReport = (reportId: string) => {
-    setReports(prev => prev.map(r => r.id === reportId ? { ...r, status: 'resolved' } : r));
-  };
-
-  const deleteCommentAdmin = (commentId: string, animeId: string) => {
-    setComments(prev => ({
-      ...prev,
-      [animeId]: (prev[animeId] || []).filter(c => c.id !== commentId)
+    setAnimeList(prev => prev.map(a => {
+      if (a.id === animeId) {
+        return { ...a, views: (a.views || 0) + 1 };
+      }
+      return a;
     }));
-  };
+  }, []);
 
-  const [platformStats, setPlatformStats] = useState<PlatformStats>({
-    totalUsers: 1,
-    usersToday: 0,
-    usersLast7Days: 1,
-    totalViews: 0,
-    todayViews: 0,
-    weeklyViews: 0,
-    monthlyViews: 0,
-    totalFavorites: 0,
-    favoritedMap: {},
-    updatedAt: new Date().toISOString()
-  });
+  // Anime CRUD Operations
+  const addAnime = useCallback((newAnime: Anime) => {
+    if (!newAnime || !newAnime.id) return;
 
-  const fetchPlatformStats = async () => {
+    setAnimeList(prev => {
+      const exists = prev.some(a => a.id === newAnime.id);
+      if (exists) {
+        return prev.map(a => a.id === newAnime.id ? newAnime : a);
+      }
+      return [newAnime, ...prev];
+    });
+  }, []);
+
+  const updateAnime = useCallback((updatedAnime: Anime) => {
+    if (!updatedAnime || !updatedAnime.id) return;
+
+    setAnimeList(prev => prev.map(a => a.id === updatedAnime.id ? updatedAnime : a));
+  }, []);
+
+  const deleteAnime = useCallback((animeId: string) => {
+    if (!animeId) return;
+
+    setAnimeList(prev => prev.filter(a => a.id !== animeId));
+
+    // Clean up associated comments to avoid orphan state
+    setComments(prev => {
+      if (!prev[animeId]) return prev;
+      const copy = { ...prev };
+      delete copy[animeId];
+      return copy;
+    });
+  }, []);
+
+  // Episode CRUD Operations
+  const addEpisode = useCallback((animeId: string, episode: Episode) => {
+    if (!animeId || !episode || !episode.id) return;
+
+    setAnimeList(prev => prev.map(anime => {
+      if (anime.id === animeId) {
+        const currentEpisodes = Array.isArray(anime.episodes) ? anime.episodes : [];
+        const episodeExists = currentEpisodes.some(e => e.id === episode.id);
+        const updatedEpisodes = episodeExists
+          ? currentEpisodes.map(e => e.id === episode.id ? episode : e)
+          : [...currentEpisodes, episode];
+
+        return {
+          ...anime,
+          episodes: updatedEpisodes
+        };
+      }
+      return anime;
+    }));
+  }, []);
+
+  const updateEpisode = useCallback((animeId: string, updatedEpisode: Episode) => {
+    if (!animeId || !updatedEpisode || !updatedEpisode.id) return;
+
+    setAnimeList(prev => prev.map(anime => {
+      if (anime.id === animeId) {
+        const currentEpisodes = Array.isArray(anime.episodes) ? anime.episodes : [];
+        return {
+          ...anime,
+          episodes: currentEpisodes.map(e => e.id === updatedEpisode.id ? updatedEpisode : e)
+        };
+      }
+      return anime;
+    }));
+  }, []);
+
+  const deleteEpisode = useCallback((animeId: string, episodeId: string) => {
+    if (!animeId || !episodeId) return;
+
+    setAnimeList(prev => prev.map(anime => {
+      if (anime.id === animeId) {
+        const currentEpisodes = Array.isArray(anime.episodes) ? anime.episodes : [];
+        return {
+          ...anime,
+          episodes: currentEpisodes.filter(e => e.id !== episodeId)
+        };
+      }
+      return anime;
+    }));
+  }, []);
+
+  // Platform Stats API & Views Tracking
+  const fetchPlatformStats = useCallback(async () => {
     try {
       const res = await fetch('/api/stats/overview');
       if (res.ok) {
-        const data = await res.json();
-        setPlatformStats(data);
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await res.json();
+          if (isMountedRef.current && data && typeof data === 'object') {
+            setPlatformStats(prev => ({ ...prev, ...data }));
+          }
+        }
       }
     } catch (err) {
-      console.error('Error fetching platform stats:', err);
+      // Safe catch block to prevent unhandled promise rejections
+      console.warn('Unable to fetch platform stats:', err);
     }
-  };
+  }, []);
 
-  const recordView = async (animeId: string, episodeId?: string, userId?: string) => {
+  const recordView = useCallback(async (animeId: string, episodeId?: string, userId?: string) => {
+    if (!animeId) return;
+
+    // Increment locally immediately for smooth UX
     incrementViews(animeId);
+
     try {
-      await fetch('/api/stats/record-view', {
+      const res = await fetch('/api/stats/record-view', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ animeId, episodeId, userId })
       });
-      fetchPlatformStats();
-    } catch (err) {
-      console.error('Error recording view:', err);
-    }
-  };
 
+      if (res.ok && isMountedRef.current) {
+        await fetchPlatformStats();
+      }
+    } catch (err) {
+      console.warn('Unable to record view on server:', err);
+    }
+  }, [incrementViews, fetchPlatformStats]);
+
+  // Polling Platform Stats Safely
   useEffect(() => {
     fetchPlatformStats();
     const interval = setInterval(() => {
-      fetchPlatformStats();
-    }, 15000); // Poll every 15s for live stats updates
-    return () => clearInterval(interval);
-  }, []);
-
-  const [supporters, setSupporters] = useState<Supporter[]>(() => {
-    try {
-      const saved = localStorage.getItem('senpaiuz_supporters');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (isMountedRef.current) {
+        fetchPlatformStats();
       }
-    } catch (e) {
-      console.error('Failed to parse supporters:', e);
-    }
-    return INITIAL_SUPPORTERS;
-  });
+    }, 15000);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('senpaiuz_supporters', JSON.stringify(supporters));
-    } catch (e) {
-      console.error('Failed to save supporters:', e);
-    }
-  }, [supporters]);
+    return () => clearInterval(interval);
+  }, [fetchPlatformStats]);
 
-  const addSupporter = (data: Partial<Supporter>) => {
+  // Supporter Management
+  const addSupporter = useCallback((data: Partial<Supporter>) => {
     const newSupporter: Supporter = {
-      id: 'supp-' + Date.now(),
+      id: 'supp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
       nickname: data.nickname || 'Anonim Supporter',
       avatar: data.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
       isVip: data.isVip ?? false,
@@ -352,24 +482,17 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       displayOrder: data.displayOrder ?? (supporters.length + 1)
     };
     setSupporters(prev => [...prev, newSupporter]);
-  };
+  }, [supporters.length]);
 
-  const updateSupporter = (id: string, updates: Partial<Supporter>) => {
+  const updateSupporter = useCallback((id: string, updates: Partial<Supporter>) => {
+    if (!id) return;
     setSupporters(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-  };
+  }, []);
 
-  const deleteSupporter = (id: string) => {
+  const deleteSupporter = useCallback((id: string) => {
+    if (!id) return;
     setSupporters(prev => prev.filter(s => s.id !== id));
-  };
-
-  const incrementViews = (animeId: string) => {
-    setAnimeList(prev => prev.map(a => {
-      if (a.id === animeId) {
-        return { ...a, views: a.views + 1 };
-      }
-      return a;
-    }));
-  };
+  }, []);
 
   return (
     <AnimeContext.Provider value={{
@@ -387,6 +510,9 @@ export const AnimeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       addAnime,
       updateAnime,
       deleteAnime,
+      addEpisode,
+      updateEpisode,
+      deleteEpisode,
       ads,
       reports,
       resolveReport,
@@ -414,3 +540,4 @@ export const useAnime = () => {
   }
   return context;
 };
+
