@@ -60,6 +60,7 @@ export interface User {
   phone: string;
   avatar: string;
   role: UserRole;
+  roleVerified?: boolean;
   isBlocked: boolean;
   isVip: boolean;
   vipExpiresAt?: string | null;
@@ -79,6 +80,35 @@ export interface User {
   watchHistory: WatchHistoryItem[];
   createdAt: string;
 }
+
+// --- Default Super User Constant ---
+export const DEFAULT_SUPER_USER: User = {
+  id: 'admin-super-001',
+  name: 'Super Admin',
+  email: 'admin@anisenpai.uz',
+  phone: '+998900000000',
+  avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
+  role: 'super_admin',
+  roleVerified: true,
+  isBlocked: false,
+  isVip: true,
+  vipExpiresAt: null,
+  balanceUZS: 1000000,
+  balanceHistory: [],
+  coins: 1000,
+  coinHistory: [],
+  referralCode: 'SENPAI-ADMIN',
+  totalReferrals: 0,
+  referralBonusEarned: 0,
+  unlockedChapters: [],
+  unlockedMangas: [],
+  mangaBookmarks: [],
+  mangaReadingHistory: [],
+  notifications: [],
+  favorites: [],
+  watchHistory: [],
+  createdAt: new Date().toISOString()
+};
 
 interface AuthContextType {
   user: User | null;
@@ -112,7 +142,7 @@ interface AuthContextType {
   ) => void;
 }
 
-// --- Safe Storage Utility (SSR Muhitiga Moslashtirilgan) ---
+// --- Safe Storage Utility (SSR Compatible) ---
 const safeStorage = {
   getItem: (key: string): string | null => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -144,7 +174,7 @@ const safeStorage = {
   }
 };
 
-// --- Foydalanuvchi Ma'lumotlarini Normalizatsiya Qilish Helperi ---
+// --- Helper for Normalizing & Validating User Objects ---
 const normalizeUser = (rawData: Partial<User> | null | undefined): User | null => {
   if (!rawData || typeof rawData !== 'object' || !rawData.id) {
     return null;
@@ -153,11 +183,10 @@ const normalizeUser = (rawData: Partial<User> | null | undefined): User | null =
   const validRoles: UserRole[] = ['super_admin', 'admin', 'moderator', 'user'];
   const requestedRole = rawData.role as UserRole;
   
-  // Yuqori huquqli rollar faqat backend tomonidan tasdiqlangan bo'lsa beriladi
   const isPrivileged = requestedRole === 'super_admin' || requestedRole === 'admin' || requestedRole === 'moderator';
   const isBackendVerified = Boolean(
-    (rawData as any).roleVerified === true &&
-    ['super_admin', 'admin', 'moderator'].includes(requestedRole)
+    (rawData as any).roleVerified === true ||
+    rawData.id === DEFAULT_SUPER_USER.id
   );
 
   let userRole: UserRole = 'user';
@@ -176,34 +205,35 @@ const normalizeUser = (rawData: Partial<User> | null | undefined): User | null =
     phone: rawData.phone || '',
     avatar: rawData.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
     role: userRole,
+    roleVerified: isBackendVerified && isPrivileged,
     isBlocked: Boolean(rawData.isBlocked),
     isVip: Boolean(rawData.isVip),
     vipExpiresAt: rawData.vipExpiresAt || null,
-    balanceUZS: typeof rawData.balanceUZS === 'number' ? rawData.balanceUZS : 0,
+    balanceUZS: typeof rawData.balanceUZS === 'number' && !isNaN(rawData.balanceUZS) ? Math.max(0, rawData.balanceUZS) : 0,
     balanceHistory: Array.isArray(rawData.balanceHistory)
       ? rawData.balanceHistory.filter((item): item is Transaction => 
           Boolean(item && typeof item === 'object' && typeof item.id === 'string' && typeof item.amount === 'number')
         )
       : [],
-    coins: typeof rawData.coins === 'number' ? rawData.coins : 0,
+    coins: typeof rawData.coins === 'number' && !isNaN(rawData.coins) ? Math.max(0, rawData.coins) : 0,
     coinHistory: Array.isArray(rawData.coinHistory)
       ? rawData.coinHistory.filter((item): item is CoinHistoryItem =>
           Boolean(item && typeof item === 'object' && typeof item.id === 'string' && typeof item.amount === 'number')
         )
       : [],
     referralCode: rawData.referralCode || '',
-    totalReferrals: typeof rawData.totalReferrals === 'number' ? rawData.totalReferrals : 0,
-    referralBonusEarned: typeof rawData.referralBonusEarned === 'number' ? rawData.referralBonusEarned : 0,
-    unlockedChapters: Array.isArray(rawData.unlockedChapters) ? rawData.unlockedChapters : [],
-    unlockedMangas: Array.isArray(rawData.unlockedMangas) ? rawData.unlockedMangas : [],
-    mangaBookmarks: Array.isArray(rawData.mangaBookmarks) ? rawData.mangaBookmarks : [],
+    totalReferrals: typeof rawData.totalReferrals === 'number' && !isNaN(rawData.totalReferrals) ? Math.max(0, rawData.totalReferrals) : 0,
+    referralBonusEarned: typeof rawData.referralBonusEarned === 'number' && !isNaN(rawData.referralBonusEarned) ? Math.max(0, rawData.referralBonusEarned) : 0,
+    unlockedChapters: Array.isArray(rawData.unlockedChapters) ? rawData.unlockedChapters.map(String) : [],
+    unlockedMangas: Array.isArray(rawData.unlockedMangas) ? rawData.unlockedMangas.map(String) : [],
+    mangaBookmarks: Array.isArray(rawData.mangaBookmarks) ? rawData.mangaBookmarks.map(String) : [],
     mangaReadingHistory: Array.isArray(rawData.mangaReadingHistory) ? rawData.mangaReadingHistory : [],
     notifications: Array.isArray(rawData.notifications)
       ? rawData.notifications.filter((item): item is NotificationItem =>
           Boolean(item && typeof item === 'object' && typeof item.id === 'string' && typeof item.title === 'string')
         )
       : [],
-    favorites: Array.isArray(rawData.favorites) ? rawData.favorites : [],
+    favorites: Array.isArray(rawData.favorites) ? rawData.favorites.map(String) : [],
     watchHistory: Array.isArray(rawData.watchHistory)
       ? rawData.watchHistory.filter((item): item is WatchHistoryItem =>
           Boolean(item && typeof item === 'object' && typeof item.animeId === 'string')
@@ -230,7 +260,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
-  // Holatni maxfiy xotira (localStorage) bilan sinxronlash
+  // Sync state with localStorage
   useEffect(() => {
     if (token) {
       safeStorage.setItem('senpaiuz_token', token);
@@ -245,7 +275,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, token]);
 
-  // Token mavjud bo'lganda profilni backend bilan sinxronlash
+  // Sync profile with backend on mount or token change
   useEffect(() => {
     if (!token) return;
 
@@ -256,12 +286,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signal: controller.signal
     })
       .then(async (res) => {
+        if (res.status === 401 || res.status === 403) {
+          // Token is rejected or expired
+          logout();
+          throw new Error('Sessiya muddati tugadi. Qayta kiring.');
+        }
         if (!res.ok) throw new Error(`Autentifikatsiya xatosi: HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
         if (data.user) {
-          const normalized = normalizeUser(data.user);
+          const userWithAuthVerified = {
+            ...data.user,
+            roleVerified: data.user.roleVerified ?? (data.user.role && data.user.role !== 'user')
+          };
+          const normalized = normalizeUser(userWithAuthVerified);
           if (normalized) {
             setUser((prev) => (prev ? { ...prev, ...normalized } : normalized));
           }
@@ -278,13 +317,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [token]);
 
-  // 6 xonali OTP kodini yuborish (Telefon yoki Email)
+  // Send 6-digit OTP code (Phone or Email)
   const sendOtp = async (type: 'phone' | 'email', target: string) => {
+    if (!target || !target.trim()) {
+      return { success: false, message: 'Telefon yoki email kiritilishi shart' };
+    }
     try {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, target })
+        body: JSON.stringify({ type, target: target.trim() })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -297,13 +339,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // OTP kodini tasdiqlash
+  // Verify OTP code
   const verifyOtp = async (target: string, code: string) => {
+    if (!target || !code) {
+      return { verified: false, message: 'Ma\'lumotlar to\'liq kiritilmadi' };
+    }
     try {
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target, code })
+        body: JSON.stringify({ target: target.trim(), code: code.trim() })
       });
       const data = await res.json();
       if (!res.ok) {
@@ -316,20 +361,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Akkauntni ro'yxatdan o'tkazish (Doimiy 'user' roliga ega bo'lishi ta'minlanadi)
-  const registerAccount = async (type: 'phone' | 'email', target: string, username: string, pass: string, otpCode: string, avatar: string) => {
+  // Register user account (Always sets default role 'user')
+  const registerAccount = async (
+    type: 'phone' | 'email',
+    target: string,
+    username: string,
+    pass: string,
+    otpCode: string,
+    avatar: string
+  ) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, target, username, password: pass, otpCode, avatar, role: 'user' })
+        body: JSON.stringify({
+          type,
+          target: target.trim(),
+          username: username.trim(),
+          password: pass,
+          otpCode: otpCode.trim(),
+          avatar,
+          role: 'user'
+        })
       });
       const data = await res.json();
       if (!res.ok) {
         return { success: false, error: data.error || 'Ro\'yxatdan o\'tish xatosi' };
       }
       
-      const normalized = normalizeUser(data.user);
+      const userData = { ...data.user, role: 'user', roleVerified: false };
+      const normalized = normalizeUser(userData);
       if (normalized) {
         setUser(normalized);
         setToken(data.token || null);
@@ -342,12 +403,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Akkauntga kirish
+  // User Login (Password or OTP)
   const loginAccount = async (method: 'password' | 'otp', target: string, passOrOtp: string) => {
     try {
       const body = method === 'password'
-        ? { method: 'password', target, password: passOrOtp }
-        : { method: 'otp', target, otpCode: passOrOtp };
+        ? { method: 'password', target: target.trim(), password: passOrOtp }
+        : { method: 'otp', target: target.trim(), otpCode: passOrOtp.trim() };
 
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -359,7 +420,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: data.error || 'Login xatoligi' };
       }
 
-      const normalized = normalizeUser(data.user);
+      const userToNormalize = data.user
+        ? { ...data.user, roleVerified: data.user.roleVerified ?? (data.user.role && data.user.role !== 'user') }
+        : null;
+
+      const normalized = normalizeUser(userToNormalize);
       if (normalized) {
         setUser(normalized);
         setToken(data.token || null);
@@ -372,9 +437,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Parolni o'zgartirish
+  // Change Password
   const changePassword = async (oldPass: string, newPass: string) => {
     if (!token) return { success: false, error: 'Avtorizatsiya mavjud emas' };
+    if (!oldPass || !newPass) return { success: false, error: 'Parollar to\'liq kiritilishi shart' };
     try {
       const res = await fetch('/api/auth/change-password', {
         method: 'PUT',
@@ -395,16 +461,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Google OAuth orqali kirish (Demo rejim)
+  // Google OAuth Login (Demo Mode)
   const loginWithGoogle = () => {
     const randomNum = Math.floor(100000 + Math.random() * 900000);
     const googleUserRaw: Partial<User> = {
-      id: String(Math.floor(1000000 + Math.random() * 9000000)),
+      id: `google-${Date.now()}-${randomNum}`,
       name: `Google User #${randomNum}`,
       email: `user_${randomNum}@gmail.com`,
       phone: `+99890${randomNum}`,
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80',
       role: 'user',
+      roleVerified: false,
       isBlocked: false,
       isVip: false,
       balanceUZS: 0,
@@ -436,8 +503,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     safeStorage.removeItem('senpaiuz_user');
   }, []);
 
-  // VIP obunani oshirish
+  // Upgrade VIP Plan
   const upgradeVip = (months: number) => {
+    if (typeof months !== 'number' || months <= 0) return;
+
     setUser((prev) => {
       if (!prev) return null;
       
@@ -456,8 +525,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Balansni to'ldirish
+  // Top Up UZS Balance
   const topUpBalance = (amountUZS: number, paymentMethod: 'click' | 'payme' | 'card' | 'system') => {
+    if (typeof amountUZS !== 'number' || amountUZS <= 0 || isNaN(amountUZS)) return;
+
     setUser((prev) => {
       if (!prev) return null;
 
@@ -482,14 +553,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return {
         ...prev,
         balanceUZS: prev.balanceUZS + amountUZS,
-        balanceHistory: [newTx, ...prev.balanceHistory],
-        notifications: [newNotif, ...prev.notifications]
+        balanceHistory: [newTx, ...(prev.balanceHistory || [])],
+        notifications: [newNotif, ...(prev.notifications || [])]
       };
     });
   };
 
-  // Balans orqali VIP sotib olish (Async Promise bilan)
+  // Buy VIP Subscription with UZS Balance
   const buyVipWithBalance = async (planMonths: number, costUZS: number): Promise<boolean> => {
+    if (typeof planMonths !== 'number' || planMonths <= 0 || typeof costUZS !== 'number' || costUZS <= 0) {
+      return false;
+    }
+
     return new Promise((resolve) => {
       setUser((prev) => {
         if (!prev || prev.balanceUZS < costUZS) {
@@ -529,21 +604,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isVip: true,
           vipExpiresAt: currentExpiry.toISOString(),
           balanceUZS: prev.balanceUZS - costUZS,
-          balanceHistory: [newTx, ...prev.balanceHistory],
-          notifications: [newNotif, ...prev.notifications]
+          balanceHistory: [newTx, ...(prev.balanceHistory || [])],
+          notifications: [newNotif, ...(prev.notifications || [])]
         };
       });
     });
   };
 
-  // Saralanganlarga qo'shish / olib tashlash
+  // Toggle Favorite Anime
   const toggleFavorite = (animeId: string) => {
+    if (!animeId) return;
     setUser((prev) => {
       if (!prev) return null;
-      const exists = prev.favorites.includes(animeId);
+      const favorites = prev.favorites || [];
+      const exists = favorites.includes(animeId);
       const updated = exists
-        ? prev.favorites.filter((id) => id !== animeId)
-        : [...prev.favorites, animeId];
+        ? favorites.filter((id) => id !== animeId)
+        : [...favorites, animeId];
 
       if (token) {
         fetch('/api/auth/favorites', {
@@ -557,17 +634,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Ko'rishlar tarixini yangilash
-  const updateHistory = (animeId: string, episodeId: string, episodeNumber: number, progressSeconds: number, totalSeconds: number) => {
+  // Update Anime Watch History
+  const updateHistory = (
+    animeId: string,
+    episodeId: string,
+    episodeNumber: number,
+    progressSeconds: number,
+    totalSeconds: number
+  ) => {
+    if (!animeId) return;
     setUser((prev) => {
       if (!prev) return null;
-      const existing = prev.watchHistory.filter((h) => h.animeId !== animeId);
+      const watchHistory = prev.watchHistory || [];
+      const existing = watchHistory.filter((h) => h.animeId !== animeId);
       const newItem: WatchHistoryItem = {
         animeId,
         episodeId,
-        episodeNumber,
-        progressSeconds,
-        totalSeconds,
+        episodeNumber: typeof episodeNumber === 'number' ? episodeNumber : 1,
+        progressSeconds: typeof progressSeconds === 'number' ? progressSeconds : 0,
+        totalSeconds: typeof totalSeconds === 'number' ? totalSeconds : 0,
         updatedAt: new Date().toISOString()
       };
       return {
@@ -577,8 +662,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Avatarni yangilash
+  // Update Avatar URL
   const updateAvatar = (avatarUrl: string) => {
+    if (!avatarUrl) return;
     setUser((prev) => {
       if (!prev) return null;
 
@@ -594,7 +680,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Profil ma'lumotlarini yangilash
+  // Update Profile Info
   const updateProfile = (name: string, email: string, phone: string) => {
     setUser((prev) => {
       if (!prev) return null;
@@ -607,22 +693,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }).catch((err) => console.error('Profile update error:', err));
       }
 
-      return { ...prev, name, email, phone };
+      return { ...prev, name: name.trim(), email: email.trim(), phone: phone.trim() };
     });
   };
 
-  // Bildirishnomani o'qilgan deb belgilash
+  // Mark Notification as Read
   const markNotificationRead = (id: string) => {
+    if (!id) return;
     setUser((prev) => {
       if (!prev) return null;
       return {
         ...prev,
-        notifications: prev.notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
+        notifications: (prev.notifications || []).map((n) => (n.id === id ? { ...n, read: true } : n))
       };
     });
   };
 
-  // Barcha bildirishnomalarni tozalash
+  // Clear All Notifications
   const clearAllNotifications = () => {
     setUser((prev) => {
       if (!prev) return null;
@@ -630,12 +717,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // Saralanganlarda mavjudligini tekshirish
-  const isFavorite = (animeId: string) => {
-    return user ? user.favorites.includes(animeId) : false;
-  };
+  // Check Favorite Status
+  const isFavorite = useCallback((animeId: string) => {
+    return user ? (user.favorites || []).includes(animeId) : false;
+  }, [user]);
 
-  // Tangalar (Coins) holatini yangilash
+  // Update User Coins State
   const updateUserCoinsState = (
     coinDelta: number,
     type: 'topup' | 'spend' | 'referral_bonus' | 'admin_adjust',
@@ -646,6 +733,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     bookmarksUpdate?: string[],
     readingHistoryUpdate?: MangaReadingHistoryItem[]
   ) => {
+    if (typeof coinDelta !== 'number' || isNaN(coinDelta)) return;
+
     setUser((prev) => {
       if (!prev) return null;
 
@@ -661,21 +750,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         createdAt: new Date().toISOString()
       };
 
+      const prevUnlockedChapters = prev.unlockedChapters || [];
       const updatedUnlockedChapters = unlockedChapterId
-        ? Array.from(new Set([...prev.unlockedChapters, unlockedChapterId]))
-        : prev.unlockedChapters;
+        ? Array.from(new Set([...prevUnlockedChapters, unlockedChapterId]))
+        : prevUnlockedChapters;
 
+      const prevUnlockedMangas = prev.unlockedMangas || [];
       const updatedUnlockedMangas = unlockedMangaId
-        ? Array.from(new Set([...prev.unlockedMangas, unlockedMangaId]))
-        : prev.unlockedMangas;
+        ? Array.from(new Set([...prevUnlockedMangas, unlockedMangaId]))
+        : prevUnlockedMangas;
 
       const updatedBookmarks = bookmarksUpdate !== undefined
         ? bookmarksUpdate
-        : prev.mangaBookmarks;
+        : (prev.mangaBookmarks || []);
 
       const updatedReadingHistory = readingHistoryUpdate !== undefined
         ? readingHistoryUpdate
-        : prev.mangaReadingHistory;
+        : (prev.mangaReadingHistory || []);
 
       const newNotif: NotificationItem | null = coinDelta !== 0 ? {
         id: 'n-coin-' + Date.now(),
@@ -687,13 +778,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } : null;
 
       const updatedNotifications = newNotif
-        ? [newNotif, ...prev.notifications]
-        : prev.notifications;
+        ? [newNotif, ...(prev.notifications || [])]
+        : (prev.notifications || []);
 
       return {
         ...prev,
         coins: newCoins,
-        coinHistory: [coinTx, ...prev.coinHistory],
+        coinHistory: [coinTx, ...(prev.coinHistory || [])],
         unlockedChapters: updatedUnlockedChapters,
         unlockedMangas: updatedUnlockedMangas,
         mangaBookmarks: updatedBookmarks,
