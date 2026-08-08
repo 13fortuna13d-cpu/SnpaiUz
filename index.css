@@ -1,0 +1,1024 @@
+@import "tailwindcss";
+
+:root {
+  --bg-main: #020617;
+  --bg-surface: #0f172a;
+  --bg-card: #0f172a;
+  --bg-card-hover: #1e293b;
+  --border-color: #1e293b;
+  --border-divider: #334155;
+  --text-title: #f8fafc;
+  --text-normal: #cbd5e1;
+  --text-secondary: #94a3b8;
+  --text-placeholder: #64748b;
+  --primary: #9333ea;
+  --primary-hover: #7e22ce;
+  --secondary: #a855f7;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="dark"] {
+  --bg-main: #020617;
+  --bg-surface: #0f172a;
+  --bg-card: #0f172a;
+  --bg-card-hover: #1e293b;
+  --border-color: #1e293b;
+  --border-divider: #334155;
+  --text-title: #f8fafc;
+  --text-normal: #cbd5e1;
+  --text-secondary: #94a3b8;
+  --text-placeholder: #64748b;
+  --primary: #9333ea;
+  --primary-hover: #7e22ce;
+  --secondary: #a855f7;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+/* ========================================================= */
+/* PREMIUM LIGHT THEME (Apple iOS & Material 3 Palette)     */
+/* ========================================================= */
+[data-theme="light"] {
+  --bg-main: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5F9;
+  --border-color: #E2E8F0;
+  --border-divider: #CBD5E1;
+  --text-title: #0F172A;
+  --text-normal: #334155;
+  --text-secondary: #64748B;
+  --text-placeholder: #94A3B8;
+  --primary: #8B5CF6;
+  --primary-hover: #7C3AED;
+  --secondary: #A855F7;
+  --accent: #F59E0B;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #3B82F6;
+}
+
+[data-theme="amoled"] {
+  --bg-main: #000000;
+  --bg-surface: #080808;
+  --bg-card: #080808;
+  --bg-card-hover: #121212;
+  --border-color: #222222;
+  --border-divider: #333333;
+  --text-title: #ffffff;
+  --text-normal: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-placeholder: #71717a;
+  --primary: #a855f7;
+  --primary-hover: #9333ea;
+  --secondary: #c084fc;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="purple"] {
+  --bg-main: #0b0514;
+  --bg-surface: #170a2a;
+  --bg-card: #170a2a;
+  --bg-card-hover: #241042;
+  --border-color: #3b176b;
+  --border-divider: #521e96;
+  --text-title: #faf5ff;
+  --text-normal: #e9d5ff;
+  --text-secondary: #d8b4fe;
+  --text-placeholder: #a855f7;
+  --primary: #a855f7;
+  --primary-hover: #9333ea;
+  --secondary: #c084fc;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="blue"] {
+  --bg-main: #020817;
+  --bg-surface: #0a132e;
+  --bg-card: #0a132e;
+  --bg-card-hover: #122147;
+  --border-color: #1e3873;
+  --border-divider: #284a98;
+  --text-title: #f0f9ff;
+  --text-normal: #bae6fd;
+  --text-secondary: #93c5fd;
+  --text-placeholder: #60a5fa;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary: #3b82f6;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="emerald"] {
+  --bg-main: #02120d;
+  --bg-surface: #06291a;
+  --bg-card: #06291a;
+  --bg-card-hover: #0a3d28;
+  --border-color: #125e3f;
+  --border-divider: #198056;
+  --text-title: #ecfdf5;
+  --text-normal: #a7f3d0;
+  --text-secondary: #6ee7b7;
+  --text-placeholder: #34d399;
+  --primary: #059669;
+  --primary-hover: #047857;
+  --secondary: #10b981;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="red"] {
+  --bg-main: #140306;
+  --bg-surface: #29070d;
+  --bg-card: #29070d;
+  --bg-card-hover: #3d0c15;
+  --border-color: #5e1422;
+  --border-divider: #831a2d;
+  --text-title: #fef2f2;
+  --text-normal: #fecaca;
+  --text-secondary: #fca5a5;
+  --text-placeholder: #f87171;
+  --primary: #dc2626;
+  --primary-hover: #b91c1c;
+  --secondary: #ef4444;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+[data-theme="sakura"] {
+  --bg-main: #180812;
+  --bg-surface: #2d0d21;
+  --bg-card: #2d0d21;
+  --bg-card-hover: #421231;
+  --border-color: #631a4a;
+  --border-divider: #8a2266;
+  --text-title: #fff1f2;
+  --text-normal: #fecdd3;
+  --text-secondary: #fda4af;
+  --text-placeholder: #fb7185;
+  --primary: #e11d48;
+  --primary-hover: #be123c;
+  --secondary: #f43f5e;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+}
+
+/* Smooth theme transitions */
+html, body, #root, header, nav, footer, div, section, article, button, input, select, textarea {
+  transition: background-color 250ms ease-in-out, border-color 250ms ease-in-out, color 250ms ease-in-out, box-shadow 250ms ease-in-out;
+}
+
+html, body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-normal);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+#root {
+  background-color: var(--bg-main) !important;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+/* ========================================================= */
+/* Z-INDEX SCALE (keep new overlays within this scale)       */
+/* 40  = persistent chrome: Header, BottomNav, PWA prompt    */
+/* 50  = in-header dropdowns/search (children of Header)     */
+/* 100 = app-level modals/drawers (Auth, Payment, Coin,      */
+/*        Notifications, Share, Rating, Voice Search, etc.)  */
+/* Modals must always be >= 100 so they never render behind  */
+/* the fixed Header, regardless of Header's own z-index.     */
+/* ========================================================= */
+
+/* Custom Scrollbar Theme Adaptation */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ========================================================= */
+/* DETAILED LIGHT THEME UI OVERRIDES (High-End Polish)      */
+/* ========================================================= */
+
+[data-theme="light"] {
+  background-color: #F8FAFC !important;
+  color: #334155 !important;
+}
+
+/* Surfaces, Cards & Background Containers */
+[data-theme="light"] .bg-slate-950,
+[data-theme="light"] .bg-slate-900,
+[data-theme="light"] .bg-slate-900\/90,
+[data-theme="light"] .bg-slate-900\/95,
+[data-theme="light"] .bg-slate-900\/80,
+[data-theme="light"] .bg-slate-900\/70,
+[data-theme="light"] .bg-slate-900\/60,
+[data-theme="light"] .bg-slate-900\/50,
+[data-theme="light"] .bg-slate-900\/40,
+[data-theme="light"] .bg-slate-950\/85,
+[data-theme="light"] .bg-slate-950\/80,
+[data-theme="light"] .bg-slate-950\/90,
+[data-theme="light"] .bg-slate-950\/95,
+[data-theme="light"] .bg-slate-950\/70,
+[data-theme="light"] .bg-slate-950\/60,
+[data-theme="light"] .bg-slate-950\/40,
+[data-theme="light"] .bg-slate-950\/30,
+[data-theme="light"] .bg-black {
+  background-color: #FFFFFF !important;
+  color: #334155 !important;
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] thead,
+[data-theme="light"] th {
+  background-color: #F1F5F9 !important;
+  color: #0F172A !important;
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] td {
+  border-color: #E2E8F0 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] .bg-slate-800,
+[data-theme="light"] .bg-slate-800\/80,
+[data-theme="light"] .bg-slate-800\/90,
+[data-theme="light"] .bg-slate-800\/50,
+[data-theme="light"] .bg-slate-800\/40,
+[data-theme="light"] .bg-slate-950\/50 {
+  background-color: #F1F5F9 !important;
+  color: #334155 !important;
+  border-color: #E2E8F0 !important;
+}
+
+[data-theme="light"] .bg-slate-700,
+[data-theme="light"] .bg-slate-700\/50 {
+  background-color: #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+/* Header Whitened Glassmorphism */
+[data-theme="light"] header {
+  background-color: rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Anime & Manga Cards in Light Mode (scoped to actual card components only,
+   not every element using the generic Tailwind "group relative" hover pair) */
+[data-theme="light"] .group.relative.bg-slate-900\/60,
+[data-theme="light"] .group.relative.bg-slate-900 {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+}
+
+[data-theme="light"] .group.relative.bg-slate-900\/60:hover,
+[data-theme="light"] .group.relative.bg-slate-900:hover {
+  border-color: rgba(139, 92, 246, 0.5) !important;
+  box-shadow: 0 16px 32px -4px rgba(139, 92, 246, 0.25), 0 0 0 1px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Poster placeholder in Light Mode */
+[data-theme="light"] .aspect-\[3\/4\] {
+  background-color: #F1F5F9 !important;
+}
+
+/* Typography in Light Mode */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] h5,
+[data-theme="light"] h6,
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-slate-100,
+[data-theme="light"] .text-slate-200 {
+  color: #0F172A !important;
+}
+
+[data-theme="light"] p,
+[data-theme="light"] span,
+[data-theme="light"] .text-slate-300 {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .text-slate-400,
+[data-theme="light"] .text-slate-500 {
+  color: #64748B !important;
+}
+
+[data-theme="light"] .text-purple-400,
+[data-theme="light"] .text-purple-300,
+[data-theme="light"] .text-purple-500 {
+  color: #8B5CF6 !important;
+}
+
+[data-theme="light"] .text-amber-400,
+[data-theme="light"] .text-amber-300 {
+  color: #D97706 !important;
+}
+
+[data-theme="light"] .text-cyan-400 {
+  color: #2563EB !important;
+}
+
+/* Additional accent text colors — darkened for AA contrast on white */
+[data-theme="light"] .text-purple-200 {
+  color: #7C3AED !important;
+}
+
+[data-theme="light"] .text-pink-300,
+[data-theme="light"] .text-pink-400 {
+  color: #DB2777 !important;
+}
+
+[data-theme="light"] .text-pink-500,
+[data-theme="light"] .text-pink-600 {
+  color: #BE185D !important;
+}
+
+[data-theme="light"] .text-sky-300,
+[data-theme="light"] .text-sky-400 {
+  color: #0284C7 !important;
+}
+
+[data-theme="light"] .text-sky-600 {
+  color: #075985 !important;
+}
+
+[data-theme="light"] .text-emerald-300,
+[data-theme="light"] .text-emerald-400 {
+  color: #059669 !important;
+}
+
+[data-theme="light"] .text-emerald-600 {
+  color: #047857 !important;
+}
+
+[data-theme="light"] .text-indigo-300,
+[data-theme="light"] .text-indigo-400 {
+  color: #4F46E5 !important;
+}
+
+[data-theme="light"] .text-rose-300,
+[data-theme="light"] .text-rose-400 {
+  color: #E11D48 !important;
+}
+
+/* Buttons in Light Mode */
+
+/* Primary Action Buttons (Purple Gradient) */
+[data-theme="light"] .bg-purple-600,
+[data-theme="light"] .bg-purple-500,
+[data-theme="light"] button.bg-purple-600,
+[data-theme="light"] button.bg-purple-500 {
+  background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.35) !important;
+}
+
+[data-theme="light"] .bg-purple-600:hover,
+[data-theme="light"] .bg-purple-500:hover,
+[data-theme="light"] button.bg-purple-600:hover,
+[data-theme="light"] button.bg-purple-500:hover {
+  background: linear-gradient(135deg, #7C3AED 0%, #9333EA 100%) !important;
+  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.45) !important;
+}
+
+[data-theme="light"] .bg-purple-600 *,
+[data-theme="light"] .bg-purple-500 *,
+[data-theme="light"] button.bg-purple-600 *,
+[data-theme="light"] button.bg-purple-500 * {
+  color: #FFFFFF !important;
+}
+
+/* Premium VIP Gold Button */
+[data-theme="light"] .from-amber-500\/20,
+[data-theme="light"] .from-amber-500 {
+  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
+  color: #FFFFFF !important;
+  border-color: #F59E0B !important;
+  box-shadow: 0 4px 14px 0 rgba(245, 158, 11, 0.35) !important;
+}
+
+[data-theme="light"] .from-amber-500 * {
+  color: #FFFFFF !important;
+}
+
+/* Secondary Button with Purple Border */
+[data-theme="light"] .border-purple-500,
+[data-theme="light"] .border-purple-600 {
+  border-color: #8B5CF6 !important;
+}
+
+/* Search Input & Form Controls in Light Mode */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border-color: #CBD5E1 !important;
+  border-radius: 12px;
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+  border-color: #8B5CF6 !important;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.18) !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+/* Bottom Navigation in Light Mode */
+[data-theme="light"] nav.fixed.bottom-0 {
+  background-color: rgba(255, 255, 255, 0.90) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-top: 1px solid #E2E8F0 !important;
+  box-shadow: 0 -4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] nav.fixed.bottom-0 button {
+  color: #64748B !important;
+}
+
+[data-theme="light"] nav.fixed.bottom-0 button.text-purple-400,
+[data-theme="light"] nav.fixed.bottom-0 button .text-purple-400 {
+  color: #8B5CF6 !important;
+}
+
+/* Modals, Dialogs & Dropdowns in Light Mode */
+[data-theme="light"] .fixed.inset-0 .bg-slate-900,
+[data-theme="light"] .fixed.inset-0 .bg-slate-950,
+[data-theme="light"] .relative.bg-slate-900,
+[data-theme="light"] .relative.bg-slate-950,
+[data-theme="light"] [role="dialog"] {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid #E2E8F0 !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.12), 0 0 1px rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Profile Card Soft Sheen in Light Mode */
+[data-theme="light"] .profile-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 60%, #F3E8FF 100%) !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.08) !important;
+}
+
+/* Telegram Banner Light Theme Polish */
+[data-theme="light"] .telegram-banner > div {
+  background: linear-gradient(135deg, #EFF6FF 0%, #F3E8FF 50%, #E0F2FE 100%) !important;
+  border: 2px solid #38BDF8 !important;
+  box-shadow: 0 10px 25px -5px rgba(56, 189, 248, 0.2) !important;
+}
+
+[data-theme="light"] .telegram-banner h3 {
+  color: #0F172A !important;
+}
+
+[data-theme="light"] .telegram-banner p {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .telegram-banner .text-sky-300 {
+  color: #0369A1 !important;
+}
+
+[data-theme="light"] .telegram-banner .text-emerald-400 {
+  color: #059669 !important;
+}
+
+/* Avatar Glow in Light Mode */
+[data-theme="light"] img.ring-2.ring-purple-500\/40,
+[data-theme="light"] div.ring-2.ring-purple-500\/40 {
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4), 0 0 18px rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Borders & Dividers in Light Mode */
+[data-theme="light"] .border-slate-800,
+[data-theme="light"] .border-slate-800\/60,
+[data-theme="light"] .border-slate-800\/80,
+[data-theme="light"] .border-slate-800\/90,
+[data-theme="light"] .border-slate-900,
+[data-theme="light"] .border-slate-700,
+[data-theme="light"] .border-slate-700\/80,
+[data-theme="light"] .border-purple-900\/30,
+[data-theme="light"] .border-purple-900\/40 {
+  border-color: #E2E8F0 !important;
+}
+
+/* Gradients Adaptation in Light Mode */
+[data-theme="light"] .from-slate-950,
+[data-theme="light"] .from-slate-900,
+[data-theme="light"] .from-slate-800 {
+  --tw-gradient-from: #F8FAFC var(--tw-gradient-from-position) !important;
+}
+
+[data-theme="light"] .to-slate-950,
+[data-theme="light"] .to-slate-950\/30,
+[data-theme="light"] .to-slate-900 {
+  --tw-gradient-to: #FFFFFF var(--tw-gradient-to-position) !important;
+}
+
+[data-theme="light"] .via-slate-950,
+[data-theme="light"] .via-slate-950\/20,
+[data-theme="light"] .via-slate-950\/70,
+[data-theme="light"] .via-slate-950\/80,
+[data-theme="light"] .via-slate-950\/90,
+[data-theme="light"] .via-slate-900,
+[data-theme="light"] .via-slate-900\/60 {
+  --tw-gradient-stops: var(--tw-gradient-from), #F1F5F9 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Video Player Display Screen remains Dark for optimal watching */
+#video-player-container,
+.video-player-screen,
+video {
+  background-color: #000000 !important;
+}
+
+/* ========================================================= */
+/* OTHER THEME OVERRIDES (AMOLED, PURPLE, BLUE, EMERALD...)  */
+/* ========================================================= */
+
+/* 2. AMOLED BLACK OVERRIDES */
+[data-theme="amoled"] .bg-slate-950 {
+  background-color: #000000 !important;
+}
+[data-theme="amoled"] .bg-slate-900,
+[data-theme="amoled"] .bg-slate-900\/90,
+[data-theme="amoled"] .bg-slate-900\/95 {
+  background-color: #080808 !important;
+}
+[data-theme="amoled"] .bg-slate-800 {
+  background-color: #121212 !important;
+}
+[data-theme="amoled"] .border-slate-800,
+[data-theme="amoled"] .border-slate-900 {
+  border-color: #1f1f1f !important;
+}
+
+/* 3. NEON PURPLE OVERRIDES */
+[data-theme="purple"] .bg-slate-950 {
+  background-color: #0b0514 !important;
+}
+[data-theme="purple"] .bg-slate-900,
+[data-theme="purple"] .bg-slate-900\/90,
+[data-theme="purple"] .bg-slate-900\/95 {
+  background-color: #170a2a !important;
+}
+[data-theme="purple"] .bg-slate-800 {
+  background-color: #241042 !important;
+}
+[data-theme="purple"] .border-slate-800,
+[data-theme="purple"] .border-slate-900 {
+  border-color: #3b176b !important;
+}
+[data-theme="purple"] .text-slate-300,
+[data-theme="purple"] .text-slate-400 {
+  color: #d8b4fe !important;
+}
+
+/* 4. OCEAN BLUE OVERRIDES */
+[data-theme="blue"] .bg-slate-950 {
+  background-color: #020817 !important;
+}
+[data-theme="blue"] .bg-slate-900,
+[data-theme="blue"] .bg-slate-900\/90,
+[data-theme="blue"] .bg-slate-900\/95 {
+  background-color: #0a132e !important;
+}
+[data-theme="blue"] .bg-slate-800 {
+  background-color: #122147 !important;
+}
+[data-theme="blue"] .border-slate-800,
+[data-theme="blue"] .border-slate-900 {
+  border-color: #1e3873 !important;
+}
+[data-theme="blue"] .text-slate-300,
+[data-theme="blue"] .text-slate-400 {
+  color: #93c5fd !important;
+}
+[data-theme="blue"] .bg-purple-600 {
+  background-color: #2563eb !important;
+}
+[data-theme="blue"] .border-purple-500 {
+  border-color: #3b82f6 !important;
+}
+[data-theme="blue"] .text-purple-400 {
+  color: #60a5fa !important;
+}
+
+/* 5. EMERALD GREEN OVERRIDES */
+[data-theme="emerald"] .bg-slate-950 {
+  background-color: #02120d !important;
+}
+[data-theme="emerald"] .bg-slate-900,
+[data-theme="emerald"] .bg-slate-900\/90,
+[data-theme="emerald"] .bg-slate-900\/95 {
+  background-color: #06291a !important;
+}
+[data-theme="emerald"] .bg-slate-800 {
+  background-color: #0a3d28 !important;
+}
+[data-theme="emerald"] .border-slate-800,
+[data-theme="emerald"] .border-slate-900 {
+  border-color: #125e3f !important;
+}
+[data-theme="emerald"] .text-slate-300,
+[data-theme="emerald"] .text-slate-400 {
+  color: #6ee7b7 !important;
+}
+[data-theme="emerald"] .bg-purple-600 {
+  background-color: #059669 !important;
+}
+[data-theme="emerald"] .border-purple-500 {
+  border-color: #10b981 !important;
+}
+[data-theme="emerald"] .text-purple-400 {
+  color: #34d399 !important;
+}
+
+/* 6. CRIMSON RED OVERRIDES */
+[data-theme="red"] .bg-slate-950 {
+  background-color: #140306 !important;
+}
+[data-theme="red"] .bg-slate-900,
+[data-theme="red"] .bg-slate-900\/90,
+[data-theme="red"] .bg-slate-900\/95 {
+  background-color: #29070d !important;
+}
+[data-theme="red"] .bg-slate-800 {
+  background-color: #3d0c15 !important;
+}
+[data-theme="red"] .border-slate-800,
+[data-theme="red"] .border-slate-900 {
+  border-color: #5e1422 !important;
+}
+[data-theme="red"] .text-slate-300,
+[data-theme="red"] .text-slate-400 {
+  color: #fca5a5 !important;
+}
+[data-theme="red"] .bg-purple-600 {
+  background-color: #dc2626 !important;
+}
+[data-theme="red"] .border-purple-500 {
+  border-color: #ef4444 !important;
+}
+[data-theme="red"] .text-purple-400 {
+  color: #f87171 !important;
+}
+
+/* 7. SAKURA ROSE OVERRIDES */
+[data-theme="sakura"] .bg-slate-950 {
+  background-color: #180812 !important;
+}
+[data-theme="sakura"] .bg-slate-900,
+[data-theme="sakura"] .bg-slate-900\/90,
+[data-theme="sakura"] .bg-slate-900\/95 {
+  background-color: #2d0d21 !important;
+}
+[data-theme="sakura"] .bg-slate-800 {
+  background-color: #421231 !important;
+}
+[data-theme="sakura"] .border-slate-800,
+[data-theme="sakura"] .border-slate-900 {
+  border-color: #631a4a !important;
+}
+[data-theme="sakura"] .text-slate-300,
+[data-theme="sakura"] .text-slate-400 {
+  color: #fda4af !important;
+}
+[data-theme="sakura"] .bg-purple-600 {
+  background-color: #e11d48 !important;
+}
+[data-theme="sakura"] .border-purple-500 {
+  border-color: #f43f5e !important;
+}
+[data-theme="sakura"] .text-purple-400 {
+  color: #fb7185 !important;
+}
+
+/* ========================================================= */
+/* THEME GAP-FILL: opacity-modifier & gradient utility classes */
+/* Tailwind generates a SEPARATE class for every opacity       */
+/* suffix (e.g. bg-slate-900/40 is not the same selector as    */
+/* bg-slate-900). The per-theme blocks above only covered the  */
+/* bare classes + /90 + /95, so any component using another    */
+/* opacity value (e.g. /50, /60, /70, /80, /30) fell back to   */
+/* the raw dark-theme Tailwind color in every non-dark theme,  */
+/* breaking contrast and consistency. This block closes that   */
+/* gap for ALL 6 alternate themes at once, driven by each      */
+/* theme's own CSS variables (already defined above), so it    */
+/* stays perfectly in sync with each theme's palette and does  */
+/* not affect the default Dark theme.                          */
+/* ========================================================= */
+[data-theme="amoled"] .bg-slate-900\/80,
+[data-theme="amoled"] .bg-slate-900\/70,
+[data-theme="amoled"] .bg-slate-900\/60,
+[data-theme="amoled"] .bg-slate-900\/50,
+[data-theme="amoled"] .bg-slate-900\/40,
+[data-theme="purple"] .bg-slate-900\/80,
+[data-theme="purple"] .bg-slate-900\/70,
+[data-theme="purple"] .bg-slate-900\/60,
+[data-theme="purple"] .bg-slate-900\/50,
+[data-theme="purple"] .bg-slate-900\/40,
+[data-theme="blue"] .bg-slate-900\/80,
+[data-theme="blue"] .bg-slate-900\/70,
+[data-theme="blue"] .bg-slate-900\/60,
+[data-theme="blue"] .bg-slate-900\/50,
+[data-theme="blue"] .bg-slate-900\/40,
+[data-theme="emerald"] .bg-slate-900\/80,
+[data-theme="emerald"] .bg-slate-900\/70,
+[data-theme="emerald"] .bg-slate-900\/60,
+[data-theme="emerald"] .bg-slate-900\/50,
+[data-theme="emerald"] .bg-slate-900\/40,
+[data-theme="red"] .bg-slate-900\/80,
+[data-theme="red"] .bg-slate-900\/70,
+[data-theme="red"] .bg-slate-900\/60,
+[data-theme="red"] .bg-slate-900\/50,
+[data-theme="red"] .bg-slate-900\/40,
+[data-theme="sakura"] .bg-slate-900\/80,
+[data-theme="sakura"] .bg-slate-900\/70,
+[data-theme="sakura"] .bg-slate-900\/60,
+[data-theme="sakura"] .bg-slate-900\/50,
+[data-theme="sakura"] .bg-slate-900\/40 {
+  background-color: var(--bg-surface) !important;
+}
+
+[data-theme="amoled"] .bg-slate-950\/85,
+[data-theme="amoled"] .bg-slate-950\/80,
+[data-theme="amoled"] .bg-slate-950\/70,
+[data-theme="amoled"] .bg-slate-950\/60,
+[data-theme="amoled"] .bg-slate-950\/50,
+[data-theme="amoled"] .bg-slate-950\/40,
+[data-theme="amoled"] .bg-slate-950\/30,
+[data-theme="purple"] .bg-slate-950\/85,
+[data-theme="purple"] .bg-slate-950\/80,
+[data-theme="purple"] .bg-slate-950\/70,
+[data-theme="purple"] .bg-slate-950\/60,
+[data-theme="purple"] .bg-slate-950\/50,
+[data-theme="purple"] .bg-slate-950\/40,
+[data-theme="purple"] .bg-slate-950\/30,
+[data-theme="blue"] .bg-slate-950\/85,
+[data-theme="blue"] .bg-slate-950\/80,
+[data-theme="blue"] .bg-slate-950\/70,
+[data-theme="blue"] .bg-slate-950\/60,
+[data-theme="blue"] .bg-slate-950\/50,
+[data-theme="blue"] .bg-slate-950\/40,
+[data-theme="blue"] .bg-slate-950\/30,
+[data-theme="emerald"] .bg-slate-950\/85,
+[data-theme="emerald"] .bg-slate-950\/80,
+[data-theme="emerald"] .bg-slate-950\/70,
+[data-theme="emerald"] .bg-slate-950\/60,
+[data-theme="emerald"] .bg-slate-950\/50,
+[data-theme="emerald"] .bg-slate-950\/40,
+[data-theme="emerald"] .bg-slate-950\/30,
+[data-theme="red"] .bg-slate-950\/85,
+[data-theme="red"] .bg-slate-950\/80,
+[data-theme="red"] .bg-slate-950\/70,
+[data-theme="red"] .bg-slate-950\/60,
+[data-theme="red"] .bg-slate-950\/50,
+[data-theme="red"] .bg-slate-950\/40,
+[data-theme="red"] .bg-slate-950\/30,
+[data-theme="sakura"] .bg-slate-950\/85,
+[data-theme="sakura"] .bg-slate-950\/80,
+[data-theme="sakura"] .bg-slate-950\/70,
+[data-theme="sakura"] .bg-slate-950\/60,
+[data-theme="sakura"] .bg-slate-950\/50,
+[data-theme="sakura"] .bg-slate-950\/40,
+[data-theme="sakura"] .bg-slate-950\/30 {
+  background-color: var(--bg-main) !important;
+}
+
+[data-theme="amoled"] .bg-slate-800\/80,
+[data-theme="amoled"] .bg-slate-800\/60,
+[data-theme="amoled"] .bg-slate-800\/50,
+[data-theme="amoled"] .bg-slate-800\/40,
+[data-theme="purple"] .bg-slate-800\/80,
+[data-theme="purple"] .bg-slate-800\/60,
+[data-theme="purple"] .bg-slate-800\/50,
+[data-theme="purple"] .bg-slate-800\/40,
+[data-theme="blue"] .bg-slate-800\/80,
+[data-theme="blue"] .bg-slate-800\/60,
+[data-theme="blue"] .bg-slate-800\/50,
+[data-theme="blue"] .bg-slate-800\/40,
+[data-theme="emerald"] .bg-slate-800\/80,
+[data-theme="emerald"] .bg-slate-800\/60,
+[data-theme="emerald"] .bg-slate-800\/50,
+[data-theme="emerald"] .bg-slate-800\/40,
+[data-theme="red"] .bg-slate-800\/80,
+[data-theme="red"] .bg-slate-800\/60,
+[data-theme="red"] .bg-slate-800\/50,
+[data-theme="red"] .bg-slate-800\/40,
+[data-theme="sakura"] .bg-slate-800\/80,
+[data-theme="sakura"] .bg-slate-800\/60,
+[data-theme="sakura"] .bg-slate-800\/50,
+[data-theme="sakura"] .bg-slate-800\/40 {
+  background-color: var(--bg-card-hover) !important;
+}
+
+[data-theme="amoled"] .border-slate-700,
+[data-theme="amoled"] .border-slate-700\/80,
+[data-theme="amoled"] .border-slate-800\/60,
+[data-theme="amoled"] .border-slate-800\/80,
+[data-theme="amoled"] .border-slate-800\/90,
+[data-theme="purple"] .border-slate-700,
+[data-theme="purple"] .border-slate-700\/80,
+[data-theme="purple"] .border-slate-800\/60,
+[data-theme="purple"] .border-slate-800\/80,
+[data-theme="purple"] .border-slate-800\/90,
+[data-theme="blue"] .border-slate-700,
+[data-theme="blue"] .border-slate-700\/80,
+[data-theme="blue"] .border-slate-800\/60,
+[data-theme="blue"] .border-slate-800\/80,
+[data-theme="blue"] .border-slate-800\/90,
+[data-theme="emerald"] .border-slate-700,
+[data-theme="emerald"] .border-slate-700\/80,
+[data-theme="emerald"] .border-slate-800\/60,
+[data-theme="emerald"] .border-slate-800\/80,
+[data-theme="emerald"] .border-slate-800\/90,
+[data-theme="red"] .border-slate-700,
+[data-theme="red"] .border-slate-700\/80,
+[data-theme="red"] .border-slate-800\/60,
+[data-theme="red"] .border-slate-800\/80,
+[data-theme="red"] .border-slate-800\/90,
+[data-theme="sakura"] .border-slate-700,
+[data-theme="sakura"] .border-slate-700\/80,
+[data-theme="sakura"] .border-slate-800\/60,
+[data-theme="sakura"] .border-slate-800\/80,
+[data-theme="sakura"] .border-slate-800\/90 {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="amoled"] .text-slate-300,
+[data-theme="amoled"] .text-slate-400,
+[data-theme="blue"] .text-slate-300,
+[data-theme="blue"] .text-slate-400,
+[data-theme="emerald"] .text-slate-300,
+[data-theme="emerald"] .text-slate-400,
+[data-theme="red"] .text-slate-300,
+[data-theme="red"] .text-slate-400,
+[data-theme="sakura"] .text-slate-300,
+[data-theme="sakura"] .text-slate-400 {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="amoled"] .from-slate-950,
+[data-theme="amoled"] .from-slate-900,
+[data-theme="amoled"] .from-slate-800,
+[data-theme="purple"] .from-slate-950,
+[data-theme="purple"] .from-slate-900,
+[data-theme="purple"] .from-slate-800,
+[data-theme="blue"] .from-slate-950,
+[data-theme="blue"] .from-slate-900,
+[data-theme="blue"] .from-slate-800,
+[data-theme="emerald"] .from-slate-950,
+[data-theme="emerald"] .from-slate-900,
+[data-theme="emerald"] .from-slate-800,
+[data-theme="red"] .from-slate-950,
+[data-theme="red"] .from-slate-900,
+[data-theme="red"] .from-slate-800,
+[data-theme="sakura"] .from-slate-950,
+[data-theme="sakura"] .from-slate-900,
+[data-theme="sakura"] .from-slate-800 {
+  --tw-gradient-from: var(--bg-main) var(--tw-gradient-from-position) !important;
+}
+
+[data-theme="amoled"] .to-slate-950,
+[data-theme="amoled"] .to-slate-950\/30,
+[data-theme="amoled"] .to-slate-900,
+[data-theme="purple"] .to-slate-950,
+[data-theme="purple"] .to-slate-950\/30,
+[data-theme="purple"] .to-slate-900,
+[data-theme="blue"] .to-slate-950,
+[data-theme="blue"] .to-slate-950\/30,
+[data-theme="blue"] .to-slate-900,
+[data-theme="emerald"] .to-slate-950,
+[data-theme="emerald"] .to-slate-950\/30,
+[data-theme="emerald"] .to-slate-900,
+[data-theme="red"] .to-slate-950,
+[data-theme="red"] .to-slate-950\/30,
+[data-theme="red"] .to-slate-900,
+[data-theme="sakura"] .to-slate-950,
+[data-theme="sakura"] .to-slate-950\/30,
+[data-theme="sakura"] .to-slate-900 {
+  --tw-gradient-to: var(--bg-surface) var(--tw-gradient-to-position) !important;
+}
+
+[data-theme="amoled"] .via-slate-950,
+[data-theme="amoled"] .via-slate-900,
+[data-theme="amoled"] .via-slate-900\/60,
+[data-theme="purple"] .via-slate-950,
+[data-theme="purple"] .via-slate-900,
+[data-theme="purple"] .via-slate-900\/60,
+[data-theme="blue"] .via-slate-950,
+[data-theme="blue"] .via-slate-900,
+[data-theme="blue"] .via-slate-900\/60,
+[data-theme="emerald"] .via-slate-950,
+[data-theme="emerald"] .via-slate-900,
+[data-theme="emerald"] .via-slate-900\/60,
+[data-theme="red"] .via-slate-950,
+[data-theme="red"] .via-slate-900,
+[data-theme="red"] .via-slate-900\/60,
+[data-theme="sakura"] .via-slate-950,
+[data-theme="sakura"] .via-slate-900,
+[data-theme="sakura"] .via-slate-900\/60 {
+  --tw-gradient-stops: var(--tw-gradient-from), var(--bg-surface) var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+
+/* Ensure form controls (input/select/textarea) always pick up the
+   active theme instead of the browser's default light widget chrome */
+[data-theme] input,
+[data-theme] select,
+[data-theme] textarea {
+  color-scheme: dark;
+}
+[data-theme="light"] input,
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  color-scheme: light;
+}
+
+/* Security & Anti-Download Protection */
+@media print {
+  body {
+    display: none !important;
+  }
+}
+
+video {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: auto;
+}
+
+/* Prevent image dragging */
+img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  user-select: none;
+}
